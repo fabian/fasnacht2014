@@ -1,3 +1,5 @@
+// Written for SparkFun EL Sequencer
+// https://www.sparkfun.com/products/11323
 
 void setup() {
     // The EL channels are on pins 2 through 9
