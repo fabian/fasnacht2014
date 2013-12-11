@@ -69,6 +69,9 @@ void loop()
     Serial.print("Brightness: ");
     Serial.println(brightness);
 
+    analogWrite(3, brightness);
+    analogWrite(5, brightness);
+
     digitalWrite(13, 0);
 }
 
