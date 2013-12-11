@@ -66,7 +66,7 @@ void loop()
         brightness = 0;
     }
 
-    Serial.print("Frequenz: ");
+    Serial.print("Frequency: ");
     Serial.println(frq);
     Serial.print("Brightness: ");
     Serial.println(brightness);
