@@ -1,7 +1,33 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/container"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="eddy.fasnacht.ChannelFrequency"
-    tools:ignore="MergeRootFrame" />
+<LinearLayout
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <include
+        android:id="@+id/channel_frequency_item_1"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        layout="@layout/channel_frequency_item" />
+
+    <include
+        android:id="@+id/channel_frequency_item_2"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        layout="@layout/channel_frequency_item" />
+
+    <include
+        android:id="@+id/channel_frequency_item_3"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        layout="@layout/channel_frequency_item" />
+
+    <include
+        android:id="@+id/channel_frequency_item_4"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        layout="@layout/channel_frequency_item" />
+
+</LinearLayout>

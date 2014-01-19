@@ -2,7 +2,8 @@
 <resources>
 
     <string name="app_name">Fasnacht</string>
-    <string name="hello_world">Hello world!</string>
+    <string name="channel">Channel</string>
+    <string name="hz">Hz</string>
     <string name="action_settings">Settings</string>
 
 </resources>
