@@ -1,12 +1,18 @@
 package eddy.fasnacht;
 
 import android.app.Activity;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.SeekBar;
 import android.widget.TextView;
+
+import java.util.EnumMap;
+import java.util.Map;
 
 import static android.widget.SeekBar.OnSeekBarChangeListener;
 
@@ -30,6 +36,46 @@ public class ChannelFrequency extends Activity {
      * Minimum frequency allowed.
      */
     private static final int MIN_FREQUENCY = 100;
+
+    public static enum Channel {
+
+        ONE(1, "pref_channel_1_frequency", R.id.channel_frequency_item_1),
+        TWO(2, "pref_channel_2_frequency", R.id.channel_frequency_item_2),
+        THREE(3, "pref_channel_3_frequency", R.id.channel_frequency_item_3),
+        FOUR(4, "pref_channel_4_frequency", R.id.channel_frequency_item_4);
+
+        private int channelId;
+        private String channelFrequencyPreferences;
+        private int viewId;
+
+        Channel(int channelId, String channelFrequencyPreferences, int viewId) {
+            this.channelId = channelId;
+            this.channelFrequencyPreferences = channelFrequencyPreferences;
+            this.viewId = viewId;
+        }
+
+
+
+        public int getChannelId() {
+            return channelId;
+        }
+
+        public String getChannelFrequencyPreferences() {
+            return channelFrequencyPreferences;
+        }
+
+        public int getViewId() {
+            return viewId;
+        }
+    }
+    public int getFrequency(Channel channel) {
+        return channelItems.get(channel).getFrequency();
+    }
+
+    public int getChannelFrequency(Channel channel) {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        return Integer.parseInt(sharedPref.getString(channel.getChannelFrequencyPreferences(), "0"));
+    }
 
     /**
      * Code representation of one channel_frequency_item in ui.
@@ -73,30 +119,49 @@ public class ChannelFrequency extends Activity {
         private void updateDetailText() {
             textDetail.setText(frequency + " " + activity.getText(R.string.hz));
         }
+
+        public int getFrequency() {
+            return frequency;
+        }
     }
+
+    private FrequencyGenerator generator = new FrequencyGenerator(this);
 
     /**
      * Array of channel items.
      */
-    private ChannelFrequencyItem[] channelItems = new ChannelFrequencyItem[4];
+    private Map<Channel, ChannelFrequencyItem> channelItems =
+            new EnumMap<Channel, ChannelFrequencyItem>(Channel.class);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_channel_frequency);
-        channelItems[0] =
-                new ChannelFrequencyItem(this, findViewById(R.id.channel_frequency_item_1), 1);
-        channelItems[1] =
-                new ChannelFrequencyItem(this, findViewById(R.id.channel_frequency_item_2), 2);
-        channelItems[2] =
-                new ChannelFrequencyItem(this, findViewById(R.id.channel_frequency_item_3), 3);
-        channelItems[3] =
-                new ChannelFrequencyItem(this, findViewById(R.id.channel_frequency_item_4), 4);
+        setContentView(R.layout.channel_frequency);
+        createChannelItem(Channel.ONE);
+        createChannelItem(Channel.TWO);
+        createChannelItem(Channel.THREE);
+        createChannelItem(Channel.FOUR);
+    }
+
+    private void createChannelItem(Channel channel) {
+        channelItems.put(channel, new ChannelFrequencyItem(this, findViewById(channel.getViewId()),
+                channel.getChannelId()));
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        generator.start();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        generator.stop();
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.channel_frequency, menu);
         return true;
@@ -109,6 +174,8 @@ public class ChannelFrequency extends Activity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_settings) {
+            Intent intent = new Intent(this, SettingsActivity.class);
+            startActivity(intent);
             return true;
         }
         return super.onOptionsItemSelected(item);

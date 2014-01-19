@@ -2,8 +2,22 @@
 <resources>
 
     <string name="app_name">Fasnacht</string>
+    <string name="title_activity_fasnacht">Fasnacht</string>
+
+    <string name="action_settings">Settings</string>
     <string name="channel">Channel</string>
     <string name="hz">Hz</string>
-    <string name="action_settings">Settings</string>
+
+    <string name="title_activity_settings">Settings</string>
+    <string name="pref_title_channel_frequency">Channel frequency</string>
+    <string name="channel_1_title">Channel 1</string>
+    <string name="channel_2_title">Channel 2</string>
+    <string name="channel_3_title">Channel 3</string>
+    <string name="channel_4_title">Channel 4</string>
+
+    <string name="pref_default_channel_1_frequency">200</string>
+    <string name="pref_default_channel_2_frequency">400</string>
+    <string name="pref_default_channel_3_frequency">600</string>
+    <string name="pref_default_channel_4_frequency">900</string>
 
 </resources>
