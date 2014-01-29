@@ -38,14 +38,13 @@ void loop()
                  ValueLast,     //last state of ValuePassed   
                  ChannelLast,   //last state of ChannelPassed 
                  Value,         //analog input of data
-                 Channel,       //analog input of channel
+                 Channel = 0,       //analog input of channel
                  ValueAvg,      //voltage average
                  ChannelAvg,    //voltage average 
                  ValueHighest = 0,     //peak value
                  ChannelHighest = 0,   //peak value
                  ValueLowest = 1023,   //peak value
-                 ChannelLowest = 1023, //peak value
-                 Channel = 0;  //output channel to write
+                 ChannelLowest = 1023; //peak value
                  
     int brightness; //brighness data
 
@@ -57,8 +56,8 @@ void loop()
 
     for (Ctr = 0; Ctr < 500; Ctr++) {
         //get input voltage
-        Value = analogRead(2);   // 2 = Audio left -> data
-        Channel = analogRead(3); // 2 = Audio right -> channel
+        Value = analogRead(3);   // 2 = Audio left -> data
+        Channel = analogRead(2); // 2 = Audio right -> channel
 
         //save peak values
         if (Value > ValueHighest) ValueHighest = Value;
@@ -100,28 +99,43 @@ void loop()
     if (brightness < 0)     brightness = 0;
 
     //get channel data and write output
-    if( (ChannelFrq > 100) && (ChannelFrq < 200) ) {
+    if( (ChannelFrq > 140) && (ChannelFrq <= 160) ) {
       analogWrite(3, brightness);
-      Serial.print("Refresh Channel 3");
+      Serial.print("Refresh Channel 3 ");
+      Serial.print("Brightness ");
+      Serial.println(brightness);      
     }
-    if( (ChannelFrq > 100) && (ChannelFrq < 200) ) {
+    if( (ChannelFrq > 240) && (ChannelFrq <= 260) ) {
       analogWrite(5, brightness);
-      Serial.print("Refresh Channel 5");
+      Serial.print("Refresh Channel 5 ");
+      Serial.print("Brightness ");
+      Serial.println(brightness);      
     }
-    if( (ChannelFrq > 100) && (ChannelFrq < 200) ) {
+    if( (ChannelFrq > 340) && (ChannelFrq <= 360) ) {
       analogWrite(6, brightness);
-      Serial.print("Refresh Channel 6");
+      Serial.print("Refresh Channel 6 ");
+      Serial.print("Brightness ");
+      Serial.println(brightness);      
     }
-    if( (ChannelFrq > 100) && (ChannelFrq < 200) ) {
+    if( (ChannelFrq > 440) && (ChannelFrq <= 460) ) {
       analogWrite(9, brightness);
-      Serial.print("Refresh Channel 9");
+      Serial.print("Refresh Channel 9 ");
+      Serial.print("Brightness ");
+      Serial.println(brightness);      
     }
 
+    
+    Serial.println("");
     //debug
-    Serial.print("Frequency: ");
+    /*Serial.print("Channel: ");
+    Serial.println(ChannelFrq);
+    Serial.print("Value: ");
     Serial.println(ValueFrq);
     Serial.print("Brightness: ");
     Serial.println(brightness);
+    */
+    Serial.print("---------------");
+    
 
 //    analogWrite(3, brightness);
 //    analogWrite(5, brightness);  
