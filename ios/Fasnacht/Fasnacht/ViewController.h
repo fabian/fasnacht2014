@@ -12,9 +12,9 @@
 @interface ViewController : UIViewController
 
 @property (weak, nonatomic) IBOutlet UISlider *sliderB;
-@property (weak, nonatomic) IBOutlet UISlider *sliderC;
 @property (weak, nonatomic) IBOutlet UISlider *sliderD;
 @property (weak, nonatomic) IBOutlet UISlider *sliderE;
+@property (weak, nonatomic) IBOutlet UISlider *sliderH;
 
 @property double thetaChannel;
 @property double thetaBrightness;

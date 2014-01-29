@@ -25,17 +25,17 @@ OSStatus RenderTone(    void *inRefCon,
     int brightnessFrequency = viewController.sliderB.value;
 
     if (viewController.channel > 30) {
-        // channel E
+        // channel H
         channelFrequency = 450;
-        brightnessFrequency = viewController.sliderE.value;
+        brightnessFrequency = viewController.sliderH.value;
     } else if (viewController.channel > 20) {
-        // channel D
+        // channel E
         channelFrequency = 350;
-        brightnessFrequency = viewController.sliderD.value;
+        brightnessFrequency = viewController.sliderE.value;
     } else if (viewController.channel > 10) {
-        // channel C
+        // channel D
         channelFrequency = 250;
-        brightnessFrequency = viewController.sliderC.value;
+        brightnessFrequency = viewController.sliderD.value;
     }
     
     double thetaChannel = viewController.thetaChannel;
@@ -90,9 +90,9 @@ OSStatus RenderTone(    void *inRefCon,
 @interface ViewController ()
 
 @property (weak, nonatomic) IBOutlet UILabel *labelB;
-@property (weak, nonatomic) IBOutlet UILabel *labelC;
 @property (weak, nonatomic) IBOutlet UILabel *labelD;
 @property (weak, nonatomic) IBOutlet UILabel *labelE;
+@property (weak, nonatomic) IBOutlet UILabel *labelH;
 
 @end
 
@@ -174,16 +174,16 @@ OSStatus RenderTone(    void *inRefCon,
 	self.labelB.text = [NSString stringWithFormat:@"%.0f Hz", slider.value];
 }
 
-- (IBAction)sliderChangedC:(UISlider *)slider {
-	self.labelC.text = [NSString stringWithFormat:@"%.0f Hz", slider.value];
-}
-
 - (IBAction)sliderChangedD:(UISlider *)slider {
 	self.labelD.text = [NSString stringWithFormat:@"%.0f Hz", slider.value];
 }
 
 - (IBAction)sliderChangedE:(UISlider *)slider {
 	self.labelE.text = [NSString stringWithFormat:@"%.0f Hz", slider.value];
+}
+
+- (IBAction)sliderChangedH:(UISlider *)slider {
+	self.labelH.text = [NSString stringWithFormat:@"%.0f Hz", slider.value];
 }
 
 
