@@ -94,8 +94,8 @@ void loop()
     time = finish - start;
     
     //calculate freq
-    ValueFrq = ValueCount * 100 / time / 2 * 10;
-    ChannelFrq = ChannelCount * 100 / time / 2 * 10;
+    ValueFrq = ValueCount * 100 / (time / 10) / 2;
+    ChannelFrq = ChannelCount * 100 / (time / 10) / 2;
     
     //get channel data and write output LEFT AUIO CHANNEL
     Serial.print(ValueCount);
