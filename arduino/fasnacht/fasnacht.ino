@@ -83,6 +83,11 @@ void loop()
         ValueLast = ValueState;
         ChannelLast = ChannelState;
     }
+    Serial.print("Max: ");
+    Serial.print(ValueHighest);
+    Serial.print(" Min: ");
+    Serial.print(ValueLowest);
+    Serial.println(" ");
 
     //get sampling time
     finish = millis();
