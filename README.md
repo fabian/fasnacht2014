@@ -23,7 +23,6 @@ Mode 2: ("quad speed")
 
 Channel B und D werden über den linken Audio-Kanal, Channel E und H über den rechten Audio-Kanal gesteuert. Im vergleich zum Mode 1 kann ein Kanal 4 mal schneller in bzw. ausgeschaltet werden, dafür wird auf die Möglichkeit vom "dimmen" verzichtet.
 
-
 Channel location:
 --------------
 
@@ -33,6 +32,7 @@ Channel location:
 |       D | De Frack |
 |       E | Ermel    |
 |       H | Hut      |
+
 Arduino IDE settings:
 =============
 
