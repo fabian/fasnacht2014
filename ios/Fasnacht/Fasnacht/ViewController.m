@@ -162,6 +162,16 @@ OSStatus RenderTone(    void *inRefCon,
     // Start playback
     err = AudioOutputUnitStart(toneUnit);
     NSAssert1(err == noErr, @"Error starting unit: %ld", err);
+    
+    
+    // start iBeacons scan
+    self.locationManager = [[CLLocationManager alloc] init];
+    self.locationManager.delegate = self;
+    
+    NSUUID *uuid = [[NSUUID alloc] initWithUUIDString:@"B9407F30-F5F8-466E-AFF9-25556B57FE6D"];
+    self.beaconRegion = [[CLBeaconRegion alloc] initWithProximityUUID:uuid major:21023 minor:64576 identifier:@"homebase.Estimote"];
+    self.beaconRegion.notifyEntryStateOnDisplay = YES;
+    [self.locationManager startMonitoringForRegion:self.beaconRegion];
 }
 
 - (void)didReceiveMemoryWarning
@@ -184,6 +194,41 @@ OSStatus RenderTone(    void *inRefCon,
 
 - (IBAction)sliderChangedH:(UISlider *)slider {
 	self.labelH.text = [NSString stringWithFormat:@"%.0f Hz", slider.value];
+}
+
+- (void)locationManager:(CLLocationManager *)manager didDetermineState:(CLRegionState)state forRegion:(CLRegion *)region
+{
+    CLBeaconRegion *beaconRegion = (CLBeaconRegion *) region;
+    
+    if (state == CLRegionStateInside) {
+        [self.locationManager startRangingBeaconsInRegion:beaconRegion];
+    } else {
+        [self.locationManager stopRangingBeaconsInRegion:beaconRegion];
+        
+        self.sliderB.value = 0;
+        self.labelB.text = [NSString stringWithFormat:@"%.0f Hz", self.sliderB.value];
+    }
+}
+
+-(void)locationManager:(CLLocationManager *)manager didRangeBeacons:(NSArray *)beacons inRegion:(CLBeaconRegion *)region
+{
+    NSString * const proximities[] = {
+        [CLProximityFar] = @"far",
+        [CLProximityImmediate] = @"immediate",
+        [CLProximityNear] = @"near",
+        [CLProximityUnknown] = @"unknown"
+    };
+    
+    for (CLBeacon *eachBeacon in beacons) {
+        
+        if (eachBeacon.proximity == CLProximityNear || eachBeacon.proximity == CLProximityImmediate) {
+            self.sliderB.value = 700;
+        } else {
+            self.sliderB.value = 0;
+        }
+
+        self.labelB.text = [NSString stringWithFormat:@"%.0f Hz", self.sliderB.value];
+    }
 }
 
 

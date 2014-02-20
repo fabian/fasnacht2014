@@ -21,6 +21,7 @@
 		1F37951B185903F7006CC78C /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1F3794FD185903F7006CC78C /* UIKit.framework */; };
 		1F379523185903F7006CC78C /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 1F379521185903F7006CC78C /* InfoPlist.strings */; };
 		1F379525185903F7006CC78C /* FasnachtTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 1F379524185903F7006CC78C /* FasnachtTests.m */; };
+		1F3FA7B1189997B2004AB86E /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1F3FA7B0189997B2004AB86E /* CoreLocation.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -53,6 +54,7 @@
 		1F379520185903F7006CC78C /* FasnachtTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "FasnachtTests-Info.plist"; sourceTree = "<group>"; };
 		1F379522185903F7006CC78C /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		1F379524185903F7006CC78C /* FasnachtTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FasnachtTests.m; sourceTree = "<group>"; };
+		1F3FA7B0189997B2004AB86E /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -60,6 +62,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1F3FA7B1189997B2004AB86E /* CoreLocation.framework in Frameworks */,
 				1F3794FC185903F7006CC78C /* CoreGraphics.framework in Frameworks */,
 				1F3794FE185903F7006CC78C /* UIKit.framework in Frameworks */,
 				1F3794FA185903F7006CC78C /* Foundation.framework in Frameworks */,
@@ -101,6 +104,7 @@
 		1F3794F8185903F7006CC78C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				1F3FA7B0189997B2004AB86E /* CoreLocation.framework */,
 				1F3794F9185903F7006CC78C /* Foundation.framework */,
 				1F3794FB185903F7006CC78C /* CoreGraphics.framework */,
 				1F3794FD185903F7006CC78C /* UIKit.framework */,
@@ -460,6 +464,7 @@
 				1F37952A185903F7006CC78C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		1F37952B185903F7006CC78C /* Build configuration list for PBXNativeTarget "FasnachtTests" */ = {
 			isa = XCConfigurationList;
@@ -468,6 +473,7 @@
 				1F37952D185903F7006CC78C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
