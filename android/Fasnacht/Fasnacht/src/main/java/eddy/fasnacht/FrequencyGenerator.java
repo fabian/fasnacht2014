@@ -1,8 +1,11 @@
 package eddy.fasnacht;
 
+import android.content.SharedPreferences;
 import android.media.AudioFormat;
 import android.media.AudioManager;
+import android.media.AudioRecord;
 import android.media.AudioTrack;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 /**
@@ -14,13 +17,15 @@ public final class FrequencyGenerator {
 
     private final String TAG = FrequencyGenerator.class.getSimpleName();
 
-    private final double duration = 0.5; // seconds
+    private final double duration; // seconds
     private final int sampleRate = 8000;
-    private final int numSamples = (int) (duration * sampleRate);
-    private final double sampleLeft[] = new double[numSamples];
-    private final double sampleRight[] = new double[numSamples];
+    private final int numSamples;
+    private final double sampleLeft[];
+    private final double sampleRight[];
 
-    private final byte generatedSnd[] = new byte[4 * numSamples];
+    private int currentI = 0;
+
+    private final byte generatedSnd[];
 
     private Thread thread;
     private final Runnable runnable = new Runnable() {
@@ -32,39 +37,70 @@ public final class FrequencyGenerator {
         }
     };
 
-    private final ChannelFrequency model;
+    private final ChannelFrequencyActivity activity;
+
+    private final AudioTrack audioTrack;
 
     private boolean running = false;
 
-    public FrequencyGenerator(ChannelFrequency model) {
-        this.model = model;
+    public FrequencyGenerator(ChannelFrequencyActivity activity) {
+        this.activity = activity;
+
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(activity);
+        duration = 1.0 / Integer.parseInt(sharedPref.getString("pref_loops_per_second", "2"));
+        //numSamples = (int) Math.round(duration * sampleRate);
+
+        numSamples = AudioRecord.getMinBufferSize(sampleRate,
+                AudioFormat.CHANNEL_OUT_STEREO,
+                AudioFormat.ENCODING_PCM_16BIT);
+
+        audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC,
+                sampleRate, AudioFormat.CHANNEL_OUT_STEREO,
+                AudioFormat.ENCODING_PCM_16BIT, numSamples,
+                AudioTrack.MODE_STREAM);
+
+        sampleLeft = new double[numSamples];
+        sampleRight = new double[numSamples];
+        generatedSnd = new byte[4 * numSamples];
     }
 
     public void start() {
-        running = true;
-        thread = new Thread(runnable);
-        thread.start();
-    }
-
-    public void stop() {
-        running = false;
-        try {
-            thread.join();
-        } catch (InterruptedException e) {
-            Log.w(TAG, "Exception while waiting for thread to terminate.", e);
+        if (!running) {
+            running = true;
+            thread = new Thread(runnable);
+            thread.start();
         }
     }
 
-    private void generateTone(ChannelFrequency.Channel channel){
-        generateTone(model.getChannelFrequency(channel), model.getFrequency(channel));
+    public void stop() {
+        if (running) {
+            running = false;
+            try {
+                thread.join();
+            } catch (InterruptedException e) {
+                Log.w(TAG, "Exception while waiting for thread to terminate.", e);
+            }
+        }
+    }
+
+    private double generateSample(int index, int frequency) {
+        if (frequency > 0) {
+            int tmp = sampleRate/frequency;
+            if (tmp > 0) {
+                return Math.sin(2 * Math.PI * index / tmp);
+            }
+        }
+        return 0;
+
     }
 
     private void generateTone(int freqOfToneLeft, int freqOfToneRight) {
 
         // fill out the array
         for (int i = 0; i < numSamples; ++i) {
-            sampleLeft[i] = Math.sin(2 * Math.PI * i / (sampleRate/freqOfToneLeft));
-            sampleRight[i] = Math.sin(2 * Math.PI * i / (sampleRate/freqOfToneRight));
+            sampleLeft[i] = generateSample(currentI, freqOfToneLeft);
+            sampleRight[i] = generateSample(currentI, freqOfToneRight);
+            currentI++;
         }
 
         // convert to 16 bit pcm sound array
@@ -84,15 +120,36 @@ public final class FrequencyGenerator {
         }
     }
 
-    private final AudioTrack audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC,
-            sampleRate, AudioFormat.CHANNEL_OUT_STEREO,
-            AudioFormat.ENCODING_PCM_16BIT, numSamples,
-            AudioTrack.MODE_STREAM);
-
     private void playSound(){
-        for (ChannelFrequency.Channel channel : ChannelFrequency.Channel.values()) {
-            generateTone(channel);
-            audioTrack.write(generatedSnd, 0, generatedSnd.length);
+
+        generateTone(
+                activity.getFrequency(ChannelFrequencyActivity.Channel.TWO),
+                activity.getFrequency(ChannelFrequencyActivity.Channel.ONE),
+                activity.getFrequency(ChannelFrequencyActivity.Channel.FOUR),
+                activity.getFrequency(ChannelFrequencyActivity.Channel.THREE));
+                audioTrack.write(generatedSnd, 0, generatedSnd.length);
+    }
+
+    private int generateFrequency(boolean channelOne, boolean channelTwo) {
+        if (channelOne) {
+            if (channelTwo) {
+                return 450;
+            } else {
+                return 350;
+            }
+        } else {
+            if (channelTwo) {
+                return 250;
+            } else {
+                return 150;
+            }
         }
+    }
+    private void generateTone(boolean channelOne, boolean channelTwo, boolean channelThree, boolean channelFour) {
+        generateTone(generateFrequency(channelOne, channelTwo), generateFrequency(channelThree, channelFour));
+    }
+
+    public boolean isRunning() {
+        return running;
     }
 }

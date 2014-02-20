@@ -1,9 +1,27 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="eddy.fasnacht.ChannelFrequency" >
-    
+    tools:context="eddy.fasnacht.ChannelFrequencyActivity" >
+
+    <item android:id="@+id/action_start"
+        android:title="@string/action_start"
+        android:orderInCategory="10"
+        android:showAsAction="ifRoom"
+        android:icon="@android:drawable/ic_media_play" />
+
+    <item android:id="@+id/action_stop"
+        android:title="@string/action_stop"
+        android:orderInCategory="20"
+        android:showAsAction="ifRoom"
+        android:icon="@android:drawable/ic_media_pause" />
+
     <item android:id="@+id/action_settings"
         android:title="@string/action_settings"
         android:orderInCategory="100"
         android:showAsAction="never" />
+
+    <item android:id="@+id/action_scan"
+        android:title="@string/action_scan"
+        android:orderInCategory="200"
+        android:showAsAction="ifRoom"
+        android:icon="@android:drawable/stat_sys_data_bluetooth"/>
 </menu>

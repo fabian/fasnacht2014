@@ -2,19 +2,17 @@ package eddy.fasnacht;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.SeekBar;
+import android.widget.CompoundButton;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import java.util.EnumMap;
 import java.util.Map;
 
-import static android.widget.SeekBar.OnSeekBarChangeListener;
 
 /**
  * Channel frequency ui. Displays one seekbar for each channel_frequency_item. Allows the user to
@@ -25,39 +23,33 @@ import static android.widget.SeekBar.OnSeekBarChangeListener;
  *
  * @author adrian
  */
-public class ChannelFrequency extends Activity {
-
-    /**
-     * Maximum frequency allowed.
-     */
-    private static final int MAX_FREQUENCY = 1000;
-
-    /**
-     * Minimum frequency allowed.
-     */
-    private static final int MIN_FREQUENCY = 100;
+public class ChannelFrequencyActivity extends Activity {
 
     public static enum Channel {
 
-        ONE(1, "pref_channel_1_frequency", R.id.channel_frequency_item_1),
-        TWO(2, "pref_channel_2_frequency", R.id.channel_frequency_item_2),
-        THREE(3, "pref_channel_3_frequency", R.id.channel_frequency_item_3),
-        FOUR(4, "pref_channel_4_frequency", R.id.channel_frequency_item_4);
+        ONE(1, R.string.channel_1_title, "pref_channel_1_frequency", R.id.channel_frequency_item_1),
+        TWO(2, R.string.channel_2_title, "pref_channel_2_frequency", R.id.channel_frequency_item_2),
+        THREE(3, R.string.channel_3_title, "pref_channel_3_frequency", R.id.channel_frequency_item_3),
+        FOUR(4, R.string.channel_4_title, "pref_channel_4_frequency", R.id.channel_frequency_item_4);
 
         private int channelId;
+        private int channelName;
         private String channelFrequencyPreferences;
         private int viewId;
 
-        Channel(int channelId, String channelFrequencyPreferences, int viewId) {
+        Channel(int channelId, int channelName, String channelFrequencyPreferences, int viewId) {
             this.channelId = channelId;
+            this.channelName = channelName;
             this.channelFrequencyPreferences = channelFrequencyPreferences;
             this.viewId = viewId;
         }
 
-
-
         public int getChannelId() {
             return channelId;
+        }
+
+        public int getChannelName() {
+            return channelName;
         }
 
         public String getChannelFrequencyPreferences() {
@@ -68,13 +60,9 @@ public class ChannelFrequency extends Activity {
             return viewId;
         }
     }
-    public int getFrequency(Channel channel) {
-        return channelItems.get(channel).getFrequency();
-    }
 
-    public int getChannelFrequency(Channel channel) {
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-        return Integer.parseInt(sharedPref.getString(channel.getChannelFrequencyPreferences(), "0"));
+    public boolean getFrequency(Channel channel) {
+        return channelItems.get(channel).isChecked();
     }
 
     /**
@@ -82,50 +70,30 @@ public class ChannelFrequency extends Activity {
      */
     private static class ChannelFrequencyItem {
 
-        private Activity activity;
         private TextView textTitle;
-        private TextView textDetail;
-        private SeekBar seekBar;
+        private Switch switchWidget;
 
-        private int frequency = MIN_FREQUENCY;
+        private boolean checked;
 
-        public ChannelFrequencyItem(Activity activity, View view, int channelId) {
-            this.activity = activity;
+        public ChannelFrequencyItem(Activity activity, View view, Channel channel) {
             textTitle = (TextView) view.findViewById(R.id.textTitle);
-            textDetail = (TextView) view.findViewById(R.id.textDetail);
-            seekBar = (SeekBar) view.findViewById(R.id.seekBar);
+            switchWidget = (Switch) view.findViewById(R.id.switchWidget);
 
-            textTitle.setText(activity.getText(R.string.channel) + " " + channelId);
-            seekBar.setMax(MAX_FREQUENCY + MIN_FREQUENCY);
-            seekBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
+            textTitle.setText(activity.getText(channel.getChannelName()));
+            switchWidget.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
-                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                    frequency = progress + MIN_FREQUENCY;
-                    updateDetailText();
-                }
-
-                @Override
-                public void onStartTrackingTouch(SeekBar seekBar) {
-                }
-
-                @Override
-                public void onStopTrackingTouch(SeekBar seekBar) {
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    ChannelFrequencyItem.this.checked = isChecked;
                 }
             });
-
-            updateDetailText();
         }
 
-        private void updateDetailText() {
-            textDetail.setText(frequency + " " + activity.getText(R.string.hz));
-        }
-
-        public int getFrequency() {
-            return frequency;
+        public boolean isChecked() {
+            return checked;
         }
     }
 
-    private FrequencyGenerator generator = new FrequencyGenerator(this);
+    private FrequencyGenerator frequencyGenerator;
 
     /**
      * Array of channel items.
@@ -136,36 +104,39 @@ public class ChannelFrequency extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        frequencyGenerator = new FrequencyGenerator(this);
+
         setContentView(R.layout.channel_frequency);
         createChannelItem(Channel.ONE);
         createChannelItem(Channel.TWO);
         createChannelItem(Channel.THREE);
         createChannelItem(Channel.FOUR);
+
+        startFrequencyGenerator(true);
     }
 
     private void createChannelItem(Channel channel) {
         channelItems.put(channel, new ChannelFrequencyItem(this, findViewById(channel.getViewId()),
-                channel.getChannelId()));
+                channel));
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        generator.start();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        generator.stop();
+    protected void onDestroy() {
+        startFrequencyGenerator(false);
+        super.onDestroy();
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.channel_frequency, menu);
+        this.menu = menu;
+        updateMenu(frequencyGenerator.isRunning());
         return true;
     }
+
+    private Menu menu;
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -177,7 +148,31 @@ public class ChannelFrequency extends Activity {
             Intent intent = new Intent(this, SettingsActivity.class);
             startActivity(intent);
             return true;
+        } else if (id == R.id.action_start) {
+            startFrequencyGenerator(true);
+            return true;
+        } else if (id == R.id.action_stop) {
+            startFrequencyGenerator(false);
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }
+
+    private void startFrequencyGenerator(boolean start) {
+        updateMenu(start);
+        if (start) {
+            frequencyGenerator.start();
+        } else {
+            frequencyGenerator.stop();
+        }
+    }
+
+    private void updateMenu(boolean running) {
+        if (menu != null) {
+            menu.findItem(R.id.action_start).setVisible(!running);
+            menu.findItem(R.id.action_stop).setVisible(running);
+        }
+    }
+
+
 }
