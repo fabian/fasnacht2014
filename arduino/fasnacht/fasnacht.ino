@@ -112,7 +112,7 @@ void loop()
       digitalWrite(5, 1); //D
       Serial.println("B ON  D ON  "); 
     } else {
-      Serial.print(ValueCount);
+      Serial.print(ValueFrq);
       Serial.println(" UNKNOWN B / D");
     }
 
