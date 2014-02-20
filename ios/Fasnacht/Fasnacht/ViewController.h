@@ -20,8 +20,8 @@
 @property (strong, nonatomic) CLBeaconRegion *beaconRegion;
 @property (strong, nonatomic) CLLocationManager *locationManager;
 
-@property double thetaChannel;
-@property double thetaBrightness;
+@property double thetaLeft;
+@property double thetaRight;
 
 @property int channel;
 

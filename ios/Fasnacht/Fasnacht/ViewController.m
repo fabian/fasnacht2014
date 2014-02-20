@@ -44,8 +44,8 @@ OSStatus RenderTone(    void *inRefCon,
         rightFrequency = 450;
     }
     
-    double thetaChannel = viewController.thetaChannel;
-	double thetaChannelIncrement = 2.0 * M_PI * leftFrequency / sampleRate;
+    double thetaLeft = viewController.thetaLeft;
+	double thetaLeftIncrement = 2.0 * M_PI * leftFrequency / sampleRate;
     
 	// Left audio channel (which channel)
 	int channel = 0;
@@ -53,39 +53,39 @@ OSStatus RenderTone(    void *inRefCon,
 
 	for (UInt32 frame = 0; frame < inNumberFrames; frame++)
 	{
-		buffer[frame] = sin(thetaChannel) * amplitude;
+		buffer[frame] = sin(thetaLeft) * amplitude;
 		
-		thetaChannel += thetaChannelIncrement;
-		if (thetaChannel > 2.0 * M_PI)
+		thetaLeft += thetaLeftIncrement;
+		if (thetaLeft > 2.0 * M_PI)
 		{
-			thetaChannel -= 2.0 * M_PI;
+			thetaLeft -= 2.0 * M_PI;
 		}
 	}
     
 	// Store the theta back in the view controller
-	viewController.thetaChannel = thetaChannel;
+	viewController.thetaLeft = thetaLeft;
 
     // Right audio channel (light brightness)
     channel = 1;
 	buffer = (Float32 *)ioData->mBuffers[channel].mData;
     
-    double thetaBrightness = viewController.thetaBrightness;
-	double thetaBrightnessIncrement = 2.0 * M_PI * rightFrequency / sampleRate;
+    double thetaRight = viewController.thetaRight;
+	double thetaRightIncrement = 2.0 * M_PI * rightFrequency / sampleRate;
     
 	// Generate the samples
 	for (UInt32 frame = 0; frame < inNumberFrames; frame++)
 	{
-		buffer[frame] = sin(thetaBrightness) * amplitude;
+		buffer[frame] = sin(thetaRight) * amplitude;
 		
-		thetaBrightness += thetaBrightnessIncrement;
-		if (thetaBrightness > 2.0 * M_PI)
+		thetaRight += thetaRightIncrement;
+		if (thetaRight > 2.0 * M_PI)
 		{
-			thetaBrightness -= 2.0 * M_PI;
+			thetaRight -= 2.0 * M_PI;
 		}
 	}
 
 	// Store the theta back in the view controller
-	viewController.thetaBrightness = thetaBrightness;
+	viewController.thetaRight = thetaRight;
 
     // next channel next time
     viewController.channel = (viewController.channel + 1) % 40;
