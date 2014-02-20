@@ -54,7 +54,7 @@ void loop()
     ValueCount = 0;
     ChannelCount = 0;
 
-    for (Ctr = 0; Ctr < 500; Ctr++) {
+    for (Ctr = 0; Ctr < 200; Ctr++) {
         //get input voltage
         Value = analogRead(3);   // 2 = Audio left -> data
         Channel = analogRead(2); // 2 = Audio right -> channel
@@ -67,7 +67,7 @@ void loop()
          
         //calculate voltage average   
         ValueAvg = (ValueHighest + ValueLowest) / 2;
-        ChannelAvg = (ChannelHighest + ChannelLowest) / 2;
+        ChannelAvg = (ChannelHighest   + ChannelLowest) / 2;
         
         //check if input is higher or lower than its average
         if (Value > ValueAvg) ValueState = 1;
@@ -92,49 +92,61 @@ void loop()
     ValueFrq = ValueCount * 100 / time / 2 * 10;
     ChannelFrq = ChannelCount * 100 / time / 2 * 10;
     
-    //get brighteness data
-    brightness = (int) (ValueFrq - 100) / 2;
-    //margins
-    if (brightness >= 255)  brightness = 255;
-    if (brightness < 0)     brightness = 0;
+    //get channel data and write output LEFT AUIO CHANNEL
+    if( (ValueFrq > 140) && (ValueFrq <= 160) ) {
+      digitalWrite(3, 0); //B
+      digitalWrite(5, 0); //D
+      Serial.print("B OFF D OFF ");
+    }
+    if( (ValueFrq > 240) && (ValueFrq <= 260) ) {
+      digitalWrite(3, 1); //B
+      digitalWrite(5, 0); //D
+      Serial.print("B ON  D OFF ");
+    }
+    if( (ValueFrq > 340) && (ValueFrq <= 360) ) {
+      digitalWrite(3, 0); //B
+      digitalWrite(5, 1); //D
+      Serial.print("B OFF D ON  ");
+    }
+    if( (ValueFrq > 440) && (ChannelFrq <= 460) ) {
+      digitalWrite(3, 1); //B
+      digitalWrite(5, 1); //D
+      Serial.print("B ON  D ON  "); 
+    }
 
-    //get channel data and write output
+    //get channel data and write output RIGHT AUIO CHANNEL
     if( (ChannelFrq > 140) && (ChannelFrq <= 160) ) {
-      analogWrite(3, brightness);
-      Serial.print("Refresh Channel 3 ");
-      Serial.print("Brightness ");
-      Serial.println(brightness);      
+      digitalWrite(6, 0); //E
+      digitalWrite(9, 0); //H
+      Serial.println("E OFF H OFF ");
     }
     if( (ChannelFrq > 240) && (ChannelFrq <= 260) ) {
-      analogWrite(5, brightness);
-      Serial.print("Refresh Channel 5 ");
-      Serial.print("Brightness ");
-      Serial.println(brightness);      
+      digitalWrite(6, 1); //E
+      digitalWrite(9, 0); //H
+      Serial.println("E ON  H OFF ");
     }
     if( (ChannelFrq > 340) && (ChannelFrq <= 360) ) {
-      analogWrite(6, brightness);
-      Serial.print("Refresh Channel 6 ");
-      Serial.print("Brightness ");
-      Serial.println(brightness);      
+      digitalWrite(6, 0); //E
+      digitalWrite(9, 1); //H
+      Serial.println("E OFF H ON  ");
     }
     if( (ChannelFrq > 440) && (ChannelFrq <= 460) ) {
-      analogWrite(9, brightness);
-      Serial.print("Refresh Channel 9 ");
-      Serial.print("Brightness ");
-      Serial.println(brightness);      
+      digitalWrite(6, 1); //E
+      digitalWrite(9, 1); //H
+      Serial.println("E ON  H ON  "); 
     }
 
-    
+    /*
     Serial.println("");
-    //debug
-    /*Serial.print("Channel: ");
+    //e
+    Serial.print("Channel: ");
     Serial.println(ChannelFrq);
     Serial.print("Value: ");
     Serial.println(ValueFrq);
     Serial.print("Brightness: ");
     Serial.println(brightness);
     */
-    Serial.print("---------------");
+    Serial.println("---------------");
     
 
 //    analogWrite(3, brightness);
