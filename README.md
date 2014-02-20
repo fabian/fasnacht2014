@@ -1,19 +1,6 @@
 Fasnacht 2014
 =============
 
-Mode 1: ("dimmer")
--------
-
-| Channel | Freq. thresholds |
-| -------- | ---------------- |
-| Channel B | 140Hz - 160Hz |
-| Channel D | 240Hz - 260Hz |
-| Channel E | 340Hz - 360Hz |
-| Channel H | 440Hz - 460Hz |
-
-Mode 2: ("quad speed")
--------
-
 | Channel B / E | Channel D / H | Freq. thresholds |
 | ------------- | ------------- | ---------------- |
 |           off |           off |    140Hz - 160Hz |
