@@ -93,47 +93,51 @@ void loop()
     ChannelFrq = ChannelCount * 100 / time / 2 * 10;
     
     //get channel data and write output LEFT AUIO CHANNEL
+    Serial.print(ValueCount);
+    Serial.print(" ");
     if( (ValueFrq > 140) && (ValueFrq <= 160) ) {
       digitalWrite(3, 0); //B
       digitalWrite(5, 0); //D
       Serial.println("B OFF D OFF ");
-    }
-    if( (ValueFrq > 240) && (ValueFrq <= 260) ) {
+    } else if( (ValueFrq > 240) && (ValueFrq <= 260) ) {
       digitalWrite(3, 1); //B
       digitalWrite(5, 0); //D
       Serial.println("B ON  D OFF ");
-    }
-    if( (ValueFrq > 340) && (ValueFrq <= 360) ) {
+    } else if( (ValueFrq > 340) && (ValueFrq <= 360) ) {
       digitalWrite(3, 0); //B
       digitalWrite(5, 1); //D
       Serial.println("B OFF D ON  ");
-    }
-    if( (ValueFrq > 440) && (ValueFrq <= 460) ) {
+    } else if( (ValueFrq > 440) && (ValueFrq <= 460) ) {
       digitalWrite(3, 1); //B
       digitalWrite(5, 1); //D
       Serial.println("B ON  D ON  "); 
+    } else {
+      Serial.print(ValueCount);
+      Serial.println(" UNKNOWN B / D");
     }
 
     //get channel data and write output RIGHT AUIO CHANNEL
+    Serial.print(ChannelCount);
+    Serial.print(" ");
     if( (ChannelFrq > 140) && (ChannelFrq <= 160) ) {
       digitalWrite(6, 0); //E
       digitalWrite(9, 0); //H
       Serial.println("E OFF H OFF ");
-    }
-    if( (ChannelFrq > 240) && (ChannelFrq <= 260) ) {
+    } else if( (ChannelFrq > 240) && (ChannelFrq <= 260) ) {
       digitalWrite(6, 1); //E
       digitalWrite(9, 0); //H
       Serial.println("E ON  H OFF ");
-    }
-    if( (ChannelFrq > 340) && (ChannelFrq <= 360) ) {
+    } else if( (ChannelFrq > 340) && (ChannelFrq <= 360) ) {
       digitalWrite(6, 0); //E
       digitalWrite(9, 1); //H
       Serial.println("E OFF H ON  ");
-    }
-    if( (ChannelFrq > 440) && (ChannelFrq <= 460) ) {
+    } else if( (ChannelFrq > 440) && (ChannelFrq <= 460) ) {
       digitalWrite(6, 1); //E
       digitalWrite(9, 1); //H
       Serial.println("E ON  H ON  "); 
+    } else {
+      Serial.print(ChannelFrq);
+      Serial.println(" UNKNOWN E / H");
     }
 
     /*
