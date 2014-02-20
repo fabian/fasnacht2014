@@ -9,7 +9,7 @@
 #import "ViewController.h"
 
 const double sampleRate = 44100;
-const double amplitude = 0.25;
+const double amplitude = 0.75;
 
 OSStatus RenderTone(    void *inRefCon,
                         AudioUnitRenderActionFlags 	*ioActionFlags,
@@ -18,6 +18,7 @@ OSStatus RenderTone(    void *inRefCon,
                         UInt32 						inNumberFrames,
                         AudioBufferList 			*ioData)
 {
+    NSLog(@"Frames %i", inNumberFrames);
 	ViewController *viewController = (__bridge ViewController *)inRefCon;
     
     // default channel B and D
@@ -48,7 +49,7 @@ OSStatus RenderTone(    void *inRefCon,
 	double thetaLeftIncrement = 2.0 * M_PI * leftFrequency / sampleRate;
     
 	// Left audio channel (which channel)
-	int channel = 0;
+	int channel = 1;
 	Float32 *buffer = (Float32 *)ioData->mBuffers[channel].mData;
 
 	for (UInt32 frame = 0; frame < inNumberFrames; frame++)
@@ -66,7 +67,7 @@ OSStatus RenderTone(    void *inRefCon,
 	viewController.thetaLeft = thetaLeft;
 
     // Right audio channel (light brightness)
-    channel = 1;
+    channel = 0;
 	buffer = (Float32 *)ioData->mBuffers[channel].mData;
     
     double thetaRight = viewController.thetaRight;
@@ -107,6 +108,17 @@ OSStatus RenderTone(    void *inRefCon,
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    
+    NSError *error = nil;
+    
+    AVAudioSession *session = [AVAudioSession sharedInstance];
+    [session setCategory: AVAudioSessionCategoryPlayback error:&error];
+    if (error)
+        NSLog(@"error setting up audio session: %@", [error localizedDescription]);
+    
+    [session setActive:YES error:&error];
+    if (error)
+        NSLog(@"error activating audio session: %@", [error localizedDescription]);
     
     AudioComponentInstance toneUnit;
     
@@ -161,6 +173,18 @@ OSStatus RenderTone(    void *inRefCon,
                                 sizeof(AudioStreamBasicDescription));
 	NSAssert1(err == noErr, @"Error setting stream format: %ld", err);
     
+    // required for background
+    UInt32 maximumFramesPerSlice = 4096;
+    
+    AudioUnitSetProperty (
+                          toneUnit,
+                          kAudioUnitProperty_MaximumFramesPerSlice,
+                          kAudioUnitScope_Global,
+                          0,                        // global scope always uses element 0
+                          &maximumFramesPerSlice,
+                          sizeof (maximumFramesPerSlice)
+                          );
+    
     // Stop changing parameters on the unit
     err = AudioUnitInitialize(toneUnit);
     NSAssert1(err == noErr, @"Error initializing unit: %ld", err);
@@ -169,6 +193,8 @@ OSStatus RenderTone(    void *inRefCon,
     err = AudioOutputUnitStart(toneUnit);
     NSAssert1(err == noErr, @"Error starting unit: %ld", err);
     
+    BOOL audioSessionActivated = [self setupAudioSession];
+    NSAssert (audioSessionActivated == YES, @"Unable to set up audio session.");
     
     // start iBeacons scan
     self.locationManager = [[CLLocationManager alloc] init];
@@ -178,6 +204,28 @@ OSStatus RenderTone(    void *inRefCon,
     self.beaconRegion = [[CLBeaconRegion alloc] initWithProximityUUID:uuid major:21023 minor:64576 identifier:@"homebase.Estimote"];
     self.beaconRegion.notifyEntryStateOnDisplay = YES;
     [self.locationManager startMonitoringForRegion:self.beaconRegion];
+}
+
+// Set up the audio session for this app.
+- (BOOL) setupAudioSession {
+    
+    AVAudioSession *mySession = [AVAudioSession sharedInstance];
+    
+    // Specify that this object is the delegate of the audio session, so that
+    //    this object's endInterruption method will be invoked when needed.
+    [mySession setDelegate: self];
+    
+    // Assign the Playback category to the audio session. This category supports
+    //    audio output with the Ring/Silent switch in the Silent position.
+    NSError *audioSessionError = nil;
+    [mySession setCategory: AVAudioSessionCategoryPlayback error: &audioSessionError];
+    if (audioSessionError != nil) {NSLog (@"Error setting audio session category."); return NO;}
+    
+    // Activate the audio session
+    [mySession setActive: YES error: &audioSessionError];
+    if (audioSessionError != nil) {NSLog (@"Error activating the audio session."); return NO;}
+    
+    return YES;
 }
 
 - (void)didReceiveMemoryWarning
@@ -195,7 +243,7 @@ OSStatus RenderTone(    void *inRefCon,
     } else {
         [self.locationManager stopRangingBeaconsInRegion:beaconRegion];
         
-        self.sliderB.on = false;
+        //self.sliderB.on = false;
     }
 }
 
@@ -211,9 +259,9 @@ OSStatus RenderTone(    void *inRefCon,
     for (CLBeacon *eachBeacon in beacons) {
         
         if (eachBeacon.proximity == CLProximityNear || eachBeacon.proximity == CLProximityImmediate) {
-            self.sliderB.on = true;
+            //self.sliderB.on = true;
         } else {
-            self.sliderB.on = false;
+            //self.sliderB.on = false;
         }
     }
 }

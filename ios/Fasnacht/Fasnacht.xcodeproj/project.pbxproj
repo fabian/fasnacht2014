@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1F071F0918B6997C009EC17A /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1F071F0818B6997C009EC17A /* AudioToolbox.framework */; };
+		1F071F0B18B699BD009EC17A /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1F071F0A18B699BD009EC17A /* AVFoundation.framework */; };
 		1F3794FA185903F7006CC78C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1F3794F9185903F7006CC78C /* Foundation.framework */; };
 		1F3794FC185903F7006CC78C /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1F3794FB185903F7006CC78C /* CoreGraphics.framework */; };
 		1F3794FE185903F7006CC78C /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1F3794FD185903F7006CC78C /* UIKit.framework */; };
@@ -35,6 +37,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		1F071F0818B6997C009EC17A /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
+		1F071F0A18B699BD009EC17A /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		1F3794F6185903F7006CC78C /* Fasnacht.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Fasnacht.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1F3794F9185903F7006CC78C /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		1F3794FB185903F7006CC78C /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -62,6 +66,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1F071F0B18B699BD009EC17A /* AVFoundation.framework in Frameworks */,
+				1F071F0918B6997C009EC17A /* AudioToolbox.framework in Frameworks */,
 				1F3FA7B1189997B2004AB86E /* CoreLocation.framework in Frameworks */,
 				1F3794FC185903F7006CC78C /* CoreGraphics.framework in Frameworks */,
 				1F3794FE185903F7006CC78C /* UIKit.framework in Frameworks */,
@@ -104,6 +110,8 @@
 		1F3794F8185903F7006CC78C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				1F071F0A18B699BD009EC17A /* AVFoundation.framework */,
+				1F071F0818B6997C009EC17A /* AudioToolbox.framework */,
 				1F3FA7B0189997B2004AB86E /* CoreLocation.framework */,
 				1F3794F9185903F7006CC78C /* Foundation.framework */,
 				1F3794FB185903F7006CC78C /* CoreGraphics.framework */,
@@ -203,6 +211,13 @@
 				LastUpgradeCheck = 0500;
 				ORGANIZATIONNAME = Fabian;
 				TargetAttributes = {
+					1F3794F5185903F7006CC78C = {
+						SystemCapabilities = {
+							com.apple.BackgroundModes = {
+								enabled = 1;
+							};
+						};
+					};
 					1F379516185903F7006CC78C = {
 						TestTargetID = 1F3794F5185903F7006CC78C;
 					};
