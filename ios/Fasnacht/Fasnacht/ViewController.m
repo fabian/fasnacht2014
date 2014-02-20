@@ -20,26 +20,32 @@ OSStatus RenderTone(    void *inRefCon,
 {
 	ViewController *viewController = (__bridge ViewController *)inRefCon;
     
-    // default channel B
-    int channelFrequency = 150;
-    int brightnessFrequency = viewController.sliderB.value;
+    // default channel B and D
+    int leftFrequency = 0;
+    if (!viewController.sliderB.on && !viewController.sliderD.on) {
+        leftFrequency = 150;
+    } else if (viewController.sliderB.on && !viewController.sliderD.on) {
+        leftFrequency = 250;
+    } else if (!viewController.sliderB.on && viewController.sliderD.on) {
+        leftFrequency = 350;
+    } else {
+        leftFrequency = 450;
+    }
 
-    if (viewController.channel > 30) {
-        // channel H
-        channelFrequency = 450;
-        brightnessFrequency = viewController.sliderH.value;
-    } else if (viewController.channel > 20) {
-        // channel E
-        channelFrequency = 350;
-        brightnessFrequency = viewController.sliderE.value;
-    } else if (viewController.channel > 10) {
-        // channel D
-        channelFrequency = 250;
-        brightnessFrequency = viewController.sliderD.value;
+    // channel E and H
+    int rightFrequency = 0;
+    if (!viewController.sliderE.on && !viewController.sliderH.on) {
+        rightFrequency = 150;
+    } else if (viewController.sliderE.on && !viewController.sliderH.on) {
+        rightFrequency = 250;
+    } else if (!viewController.sliderE.on && viewController.sliderH.on) {
+        rightFrequency = 350;
+    } else {
+        rightFrequency = 450;
     }
     
     double thetaChannel = viewController.thetaChannel;
-	double thetaChannelIncrement = 2.0 * M_PI * channelFrequency / sampleRate;
+	double thetaChannelIncrement = 2.0 * M_PI * leftFrequency / sampleRate;
     
 	// Left audio channel (which channel)
 	int channel = 0;
@@ -64,7 +70,7 @@ OSStatus RenderTone(    void *inRefCon,
 	buffer = (Float32 *)ioData->mBuffers[channel].mData;
     
     double thetaBrightness = viewController.thetaBrightness;
-	double thetaBrightnessIncrement = 2.0 * M_PI * brightnessFrequency / sampleRate;
+	double thetaBrightnessIncrement = 2.0 * M_PI * rightFrequency / sampleRate;
     
 	// Generate the samples
 	for (UInt32 frame = 0; frame < inNumberFrames; frame++)
@@ -89,10 +95,10 @@ OSStatus RenderTone(    void *inRefCon,
 
 @interface ViewController ()
 
-@property (weak, nonatomic) IBOutlet UILabel *labelB;
-@property (weak, nonatomic) IBOutlet UILabel *labelD;
-@property (weak, nonatomic) IBOutlet UILabel *labelE;
-@property (weak, nonatomic) IBOutlet UILabel *labelH;
+@property (weak, nonatomic) IBOutlet UISwitch *labelB;
+@property (weak, nonatomic) IBOutlet UISwitch *labelD;
+@property (weak, nonatomic) IBOutlet UISwitch *labelE;
+@property (weak, nonatomic) IBOutlet UISwitch *labelH;
 
 @end
 
@@ -180,22 +186,6 @@ OSStatus RenderTone(    void *inRefCon,
     // Dispose of any resources that can be recreated.
 }
 
-- (IBAction)sliderChangedB:(UISlider *)slider {
-	self.labelB.text = [NSString stringWithFormat:@"%.0f Hz", slider.value];
-}
-
-- (IBAction)sliderChangedD:(UISlider *)slider {
-	self.labelD.text = [NSString stringWithFormat:@"%.0f Hz", slider.value];
-}
-
-- (IBAction)sliderChangedE:(UISlider *)slider {
-	self.labelE.text = [NSString stringWithFormat:@"%.0f Hz", slider.value];
-}
-
-- (IBAction)sliderChangedH:(UISlider *)slider {
-	self.labelH.text = [NSString stringWithFormat:@"%.0f Hz", slider.value];
-}
-
 - (void)locationManager:(CLLocationManager *)manager didDetermineState:(CLRegionState)state forRegion:(CLRegion *)region
 {
     CLBeaconRegion *beaconRegion = (CLBeaconRegion *) region;
@@ -205,8 +195,7 @@ OSStatus RenderTone(    void *inRefCon,
     } else {
         [self.locationManager stopRangingBeaconsInRegion:beaconRegion];
         
-        self.sliderB.value = 0;
-        self.labelB.text = [NSString stringWithFormat:@"%.0f Hz", self.sliderB.value];
+        self.sliderB.on = false;
     }
 }
 
@@ -222,12 +211,10 @@ OSStatus RenderTone(    void *inRefCon,
     for (CLBeacon *eachBeacon in beacons) {
         
         if (eachBeacon.proximity == CLProximityNear || eachBeacon.proximity == CLProximityImmediate) {
-            self.sliderB.value = 700;
+            self.sliderB.on = true;
         } else {
-            self.sliderB.value = 0;
+            self.sliderB.on = false;
         }
-
-        self.labelB.text = [NSString stringWithFormat:@"%.0f Hz", self.sliderB.value];
     }
 }
 

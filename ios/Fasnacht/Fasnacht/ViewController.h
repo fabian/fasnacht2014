@@ -12,10 +12,10 @@
 
 @interface ViewController : UIViewController
 
-@property (weak, nonatomic) IBOutlet UISlider *sliderB;
-@property (weak, nonatomic) IBOutlet UISlider *sliderD;
-@property (weak, nonatomic) IBOutlet UISlider *sliderE;
-@property (weak, nonatomic) IBOutlet UISlider *sliderH;
+@property (weak, nonatomic) IBOutlet UISwitch *sliderB;
+@property (weak, nonatomic) IBOutlet UISwitch *sliderD;
+@property (weak, nonatomic) IBOutlet UISwitch *sliderE;
+@property (weak, nonatomic) IBOutlet UISwitch *sliderH;
 
 @property (strong, nonatomic) CLBeaconRegion *beaconRegion;
 @property (strong, nonatomic) CLLocationManager *locationManager;
