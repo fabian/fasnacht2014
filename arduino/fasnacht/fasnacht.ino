@@ -108,7 +108,7 @@ void loop()
       digitalWrite(5, 1); //D
       Serial.println("B OFF D ON  ");
     }
-    if( (ValueFrq > 440) && (ChannelFrq <= 460) ) {
+    if( (ValueFrq > 440) && (ValueFrq <= 460) ) {
       digitalWrite(3, 1); //B
       digitalWrite(5, 1); //D
       Serial.println("B ON  D ON  "); 
