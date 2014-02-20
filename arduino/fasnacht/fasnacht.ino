@@ -96,22 +96,22 @@ void loop()
     if( (ValueFrq > 140) && (ValueFrq <= 160) ) {
       digitalWrite(3, 0); //B
       digitalWrite(5, 0); //D
-      Serial.print("B OFF D OFF ");
+      Serial.println("B OFF D OFF ");
     }
     if( (ValueFrq > 240) && (ValueFrq <= 260) ) {
       digitalWrite(3, 1); //B
       digitalWrite(5, 0); //D
-      Serial.print("B ON  D OFF ");
+      Serial.println("B ON  D OFF ");
     }
     if( (ValueFrq > 340) && (ValueFrq <= 360) ) {
       digitalWrite(3, 0); //B
       digitalWrite(5, 1); //D
-      Serial.print("B OFF D ON  ");
+      Serial.println("B OFF D ON  ");
     }
     if( (ValueFrq > 440) && (ChannelFrq <= 460) ) {
       digitalWrite(3, 1); //B
       digitalWrite(5, 1); //D
-      Serial.print("B ON  D ON  "); 
+      Serial.println("B ON  D ON  "); 
     }
 
     //get channel data and write output RIGHT AUIO CHANNEL
