@@ -102,19 +102,19 @@ void loop()
     Serial.print(" ");
     Serial.print(ValueFrq);
     Serial.print(" ");
-    if( (ValueFrq > 100) && (ValueFrq <= 200) ) {
+    if( (ValueFrq > 140) && (ValueFrq <= 160) ) {
       digitalWrite(3, 0); //B
       digitalWrite(5, 0); //D
       Serial.println("B OFF D OFF ");
-    } else if( (ValueFrq > 200) && (ValueFrq <= 300) ) {
+    } else if( (ValueFrq > 240) && (ValueFrq <= 260) ) {
       digitalWrite(3, 1); //B
       digitalWrite(5, 0); //D
       Serial.println("B ON  D OFF ");
-    } else if( (ValueFrq > 300) && (ValueFrq <= 400) ) {
+    } else if( (ValueFrq > 340) && (ValueFrq <= 360) ) {
       digitalWrite(3, 0); //B
       digitalWrite(5, 1); //D
       Serial.println("B OFF D ON  ");
-    } else if( (ValueFrq > 400) && (ValueFrq <= 500) ) {
+    } else if( (ValueFrq > 440) && (ValueFrq <= 460) ) {
       digitalWrite(3, 1); //B
       digitalWrite(5, 1); //D
       Serial.println("B ON  D ON  "); 
@@ -127,19 +127,19 @@ void loop()
     Serial.print(" ");
     Serial.print(ChannelFrq);
     Serial.print(" ");
-    if( (ChannelFrq > 100) && (ChannelFrq <= 200) ) {
+    if( (ChannelFrq > 140) && (ChannelFrq <= 160) ) {
       digitalWrite(6, 0); //E
       digitalWrite(9, 0); //H
       Serial.println("E OFF H OFF ");
-    } else if( (ChannelFrq > 200) && (ChannelFrq <= 300) ) {
+    } else if( (ChannelFrq > 240) && (ChannelFrq <= 260) ) {
       digitalWrite(6, 1); //E
       digitalWrite(9, 0); //H
       Serial.println("E ON  H OFF ");
-    } else if( (ChannelFrq > 300) && (ChannelFrq <= 400) ) {
+    } else if( (ChannelFrq > 340) && (ChannelFrq <= 360) ) {
       digitalWrite(6, 0); //E
       digitalWrite(9, 1); //H
       Serial.println("E OFF H ON  ");
-    } else if( (ChannelFrq > 400) && (ChannelFrq <= 500) ) {
+    } else if( (ChannelFrq > 440) && (ChannelFrq <= 460) ) {
       digitalWrite(6, 1); //E
       digitalWrite(9, 1); //H
       Serial.println("E ON  H ON  "); 
