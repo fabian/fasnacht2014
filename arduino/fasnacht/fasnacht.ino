@@ -95,48 +95,50 @@ void loop()
     //get channel data and write output LEFT AUIO CHANNEL
     Serial.print(ValueCount);
     Serial.print(" ");
-    if( (ValueFrq > 140) && (ValueFrq <= 160) ) {
+    Serial.print(ValueFrq);
+    Serial.print(" ");
+    if( (ValueFrq > 100) && (ValueFrq <= 200) ) {
       digitalWrite(3, 0); //B
       digitalWrite(5, 0); //D
       Serial.println("B OFF D OFF ");
-    } else if( (ValueFrq > 240) && (ValueFrq <= 260) ) {
+    } else if( (ValueFrq > 200) && (ValueFrq <= 300) ) {
       digitalWrite(3, 1); //B
       digitalWrite(5, 0); //D
       Serial.println("B ON  D OFF ");
-    } else if( (ValueFrq > 340) && (ValueFrq <= 360) ) {
+    } else if( (ValueFrq > 300) && (ValueFrq <= 400) ) {
       digitalWrite(3, 0); //B
       digitalWrite(5, 1); //D
       Serial.println("B OFF D ON  ");
-    } else if( (ValueFrq > 440) && (ValueFrq <= 460) ) {
+    } else if( (ValueFrq > 400) && (ValueFrq <= 500) ) {
       digitalWrite(3, 1); //B
       digitalWrite(5, 1); //D
       Serial.println("B ON  D ON  "); 
     } else {
-      Serial.print(ValueFrq);
       Serial.println(" UNKNOWN B / D");
     }
 
     //get channel data and write output RIGHT AUIO CHANNEL
     Serial.print(ChannelCount);
     Serial.print(" ");
-    if( (ChannelFrq > 140) && (ChannelFrq <= 160) ) {
+    Serial.print(ChannelFrq);
+    Serial.print(" ");
+    if( (ChannelFrq > 100) && (ChannelFrq <= 200) ) {
       digitalWrite(6, 0); //E
       digitalWrite(9, 0); //H
       Serial.println("E OFF H OFF ");
-    } else if( (ChannelFrq > 240) && (ChannelFrq <= 260) ) {
+    } else if( (ChannelFrq > 200) && (ChannelFrq <= 300) ) {
       digitalWrite(6, 1); //E
       digitalWrite(9, 0); //H
       Serial.println("E ON  H OFF ");
-    } else if( (ChannelFrq > 340) && (ChannelFrq <= 360) ) {
+    } else if( (ChannelFrq > 300) && (ChannelFrq <= 400) ) {
       digitalWrite(6, 0); //E
       digitalWrite(9, 1); //H
       Serial.println("E OFF H ON  ");
-    } else if( (ChannelFrq > 440) && (ChannelFrq <= 460) ) {
+    } else if( (ChannelFrq > 400) && (ChannelFrq <= 500) ) {
       digitalWrite(6, 1); //E
       digitalWrite(9, 1); //H
       Serial.println("E ON  H ON  "); 
     } else {
-      Serial.print(ChannelFrq);
       Serial.println(" UNKNOWN E / H");
     }
 
