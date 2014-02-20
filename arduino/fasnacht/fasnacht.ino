@@ -24,55 +24,144 @@ void setup() {
 
 void loop() 
 {
-    unsigned long start, count, finish, time, frq;
-    unsigned int x, b, last, value, avg, highest = 0, lowest = 1023;
-    int brightness;
+    unsigned long start,        //time when sampling started
+                  finish,       //time when sampling ended
+                  time,         //sampling time
+                  ValueCount,   //counts Value average crossings
+                  ChannelCount, //counts Channel average crossings
+                  ValueFrq,     //Final Input freq of Value data
+                  ChannelFrq;   //Final Input freq of Channel data
+                  
+    unsigned int Ctr,           //counter
+                 ValueState,    //set if Value is bigger than its Average
+                 ChannelState,  //set if Channel is bigger than its Average
+                 ValueLast,     //last state of ValuePassed   
+                 ChannelLast,   //last state of ChannelPassed 
+                 Value,         //analog input of data
+                 Channel = 0,       //analog input of channel
+                 ValueAvg,      //voltage average
+                 ChannelAvg,    //voltage average 
+                 ValueHighest = 0,     //peak value
+                 ChannelHighest = 0,   //peak value
+                 ValueLowest = 1023,   //peak value
+                 ChannelLowest = 1023; //peak value
+                 
+    int brightness; //brighness data
 
     digitalWrite(13, 1);
 
-    start = millis();
-    count = 0;
+    start = millis();  //get arduino uptimes (unsigned long): max 50days :P
+    ValueCount = 0;
+    ChannelCount = 0;
 
-    for (x = 0; x < 500; x++) {
-        value = analogRead(2); // 2 = Audio links, 3 = Audio rechts
-        if (value > highest) {
-            highest = value;
-        }
-        if (value < lowest) {
-            lowest = value;
-        }
-        avg = (highest + lowest) / 2;
+    for (Ctr = 0; Ctr < 200; Ctr++) {
+        //get input voltage
+        Value = analogRead(3);   // 2 = Audio left -> data
+        Channel = analogRead(2); // 2 = Audio right -> channel
+
+        //save peak values
+        if (Value > ValueHighest) ValueHighest = Value;
+        if (Value < ValueLowest)  ValueLowest = Value;
+        if (Channel > ChannelHighest) ChannelHighest = Channel;
+        if (Channel < ChannelLowest)  ChannelLowest = Channel;
+         
+        //calculate voltage average   
+        ValueAvg = (ValueHighest + ValueLowest) / 2;
+        ChannelAvg = (ChannelHighest   + ChannelLowest) / 2;
         
-        if (value > avg) {
-          b = 1;
-        } else {
-          b = 0;
-        }
-        if (b != last) {
-            count++;
-        }
-        last = b;
+        //check if input is higher or lower than its average
+        if (Value > ValueAvg) ValueState = 1;
+        else ValueState = 0;
+        if (Channel > ChannelAvg) ChannelState = 1;
+        else ChannelState = 0;
+        
+        //count number of average crossings
+        if (ValueState != ValueLast) ValueCount++;
+        if (ChannelState != ChannelLast) ChannelCount++;
+        
+        //save state
+        ValueLast = ValueState;
+        ChannelLast = ChannelState;
     }
+    Serial.print("Max: ");
+    Serial.print(ValueHighest);
+    Serial.print(" Min: ");
+    Serial.print(ValueLowest);
+    Serial.println(" ");
 
+    //get sampling time
     finish = millis();
     time = finish - start;
-    frq = count * 100 / time / 2 * 10;
-    brightness = (int) (frq - 100) / 2;
-
-    if (brightness >= 255) {
-        brightness = 255;
+    
+    //calculate freq
+    ValueFrq = ValueCount * 100 / time / 2 * 10;
+    ChannelFrq = ChannelCount * 100 / time / 2 * 10;
+    
+    //get channel data and write output LEFT AUIO CHANNEL
+    Serial.print(ValueCount);
+    Serial.print(" ");
+    Serial.print(ValueFrq);
+    Serial.print(" ");
+    if( (ValueFrq > 100) && (ValueFrq <= 200) ) {
+      digitalWrite(3, 0); //B
+      digitalWrite(5, 0); //D
+      Serial.println("B OFF D OFF ");
+    } else if( (ValueFrq > 200) && (ValueFrq <= 300) ) {
+      digitalWrite(3, 1); //B
+      digitalWrite(5, 0); //D
+      Serial.println("B ON  D OFF ");
+    } else if( (ValueFrq > 300) && (ValueFrq <= 400) ) {
+      digitalWrite(3, 0); //B
+      digitalWrite(5, 1); //D
+      Serial.println("B OFF D ON  ");
+    } else if( (ValueFrq > 400) && (ValueFrq <= 500) ) {
+      digitalWrite(3, 1); //B
+      digitalWrite(5, 1); //D
+      Serial.println("B ON  D ON  "); 
+    } else {
+      Serial.println(" UNKNOWN B / D");
     }
-    if (brightness < 0) {
-        brightness = 0;
+
+    //get channel data and write output RIGHT AUIO CHANNEL
+    Serial.print(ChannelCount);
+    Serial.print(" ");
+    Serial.print(ChannelFrq);
+    Serial.print(" ");
+    if( (ChannelFrq > 100) && (ChannelFrq <= 200) ) {
+      digitalWrite(6, 0); //E
+      digitalWrite(9, 0); //H
+      Serial.println("E OFF H OFF ");
+    } else if( (ChannelFrq > 200) && (ChannelFrq <= 300) ) {
+      digitalWrite(6, 1); //E
+      digitalWrite(9, 0); //H
+      Serial.println("E ON  H OFF ");
+    } else if( (ChannelFrq > 300) && (ChannelFrq <= 400) ) {
+      digitalWrite(6, 0); //E
+      digitalWrite(9, 1); //H
+      Serial.println("E OFF H ON  ");
+    } else if( (ChannelFrq > 400) && (ChannelFrq <= 500) ) {
+      digitalWrite(6, 1); //E
+      digitalWrite(9, 1); //H
+      Serial.println("E ON  H ON  "); 
+    } else {
+      Serial.println(" UNKNOWN E / H");
     }
 
-    Serial.print("Frequency: ");
-    Serial.println(frq);
+    /*
+    Serial.println("");
+    //e
+    Serial.print("Channel: ");
+    Serial.println(ChannelFrq);
+    Serial.print("Value: ");
+    Serial.println(ValueFrq);
     Serial.print("Brightness: ");
     Serial.println(brightness);
+    */
+    Serial.println("---------------");
+    
 
-    analogWrite(3, brightness);
-    analogWrite(5, brightness);
+//    analogWrite(3, brightness);
+//    analogWrite(5, brightness);  
 
     digitalWrite(13, 0);
 }
