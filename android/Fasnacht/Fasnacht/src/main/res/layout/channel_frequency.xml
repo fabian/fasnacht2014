@@ -6,6 +6,11 @@
     android:paddingRight="16dp"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <Spinner
+        android:id="@+id/modes_spinner"
+        android:layout_width="match_parent"
+        android:layout_height="48dp" />
+
     <include
         android:id="@+id/channel_frequency_item_1"
         android:layout_width="fill_parent"
