@@ -18,9 +18,74 @@ OSStatus RenderTone(    void *inRefCon,
                         UInt32 						inNumberFrames,
                         AudioBufferList 			*ioData)
 {
-    NSLog(@"Frames %i", inNumberFrames);
 	ViewController *viewController = (__bridge ViewController *)inRefCon;
+    //NSLog(@"Frames %i, %i", inNumberFrames, viewController.modeCounter * 1024 / 256);
     
+    int i = (viewController.modeCounter * 1024 / inNumberFrames);
+    int speed = 32;
+    if (i % speed == 0) {
+        
+        NSLog(@"Time Interval: %f", [[NSDate date] timeIntervalSince1970] - viewController.lastTime);
+        viewController.lastTime = [[NSDate date] timeIntervalSince1970];
+        
+        if ([viewController.mode isEqualToString:@"Random"]) {
+            
+            int randomB = (arc4random() % ((unsigned)RAND_MAX + 1));
+            dispatch_async(dispatch_get_main_queue(), ^{ viewController.sliderB.on = (randomB % 5 == 0); } );
+            int randomD = (arc4random() % ((unsigned)RAND_MAX + 1));
+            dispatch_async(dispatch_get_main_queue(), ^{ viewController.sliderD.on = (randomD % 5 == 0); } );
+            int randomE = (arc4random() % ((unsigned)RAND_MAX + 1));
+            dispatch_async(dispatch_get_main_queue(), ^{ viewController.sliderE.on = (randomE % 5 == 0); } );
+            int randomH = (arc4random() % ((unsigned)RAND_MAX + 1));
+            dispatch_async(dispatch_get_main_queue(), ^{ viewController.sliderH.on = (randomH % 5 == 0); } );
+            
+        } else if ([viewController.mode isEqualToString:@"Loop"]) {
+            
+            int max = speed * 4;
+            BOOL onB = i % max == speed * 0;
+            dispatch_async(dispatch_get_main_queue(), ^{ viewController.sliderB.on = onB; } );
+            BOOL onD = i % max == speed * 1;
+            dispatch_async(dispatch_get_main_queue(), ^{ viewController.sliderD.on = onD; } );
+            BOOL onE = i % max == speed * 2;
+            dispatch_async(dispatch_get_main_queue(), ^{ viewController.sliderE.on = onE; } );
+            BOOL onH = i % max == speed * 3;
+            dispatch_async(dispatch_get_main_queue(), ^{ viewController.sliderH.on = onH; } );
+            
+        } else if ([viewController.mode isEqualToString:@"Chain"]) {
+            
+            int max = speed * viewController.stepperTotal.value;
+            BOOL on = i % max == speed * viewController.stepperPosition.value;
+            dispatch_async(dispatch_get_main_queue(), ^{ viewController.sliderB.on = on; } );
+            dispatch_async(dispatch_get_main_queue(), ^{ viewController.sliderD.on = on; } );
+            dispatch_async(dispatch_get_main_queue(), ^{ viewController.sliderE.on = on; } );
+            dispatch_async(dispatch_get_main_queue(), ^{ viewController.sliderH.on = on; } );
+            
+        } else if ([viewController.mode isEqualToString:@"Blink"]) {
+            
+            int max = speed * 2;
+            BOOL on = i % max == 0;
+            dispatch_async(dispatch_get_main_queue(), ^{ viewController.sliderB.on = on; } );
+            dispatch_async(dispatch_get_main_queue(), ^{ viewController.sliderD.on = on; } );
+            dispatch_async(dispatch_get_main_queue(), ^{ viewController.sliderE.on = on; } );
+            dispatch_async(dispatch_get_main_queue(), ^{ viewController.sliderH.on = on; } );
+            
+        } else if ([viewController.mode isEqualToString:@"Switch"]) {
+            
+            int max = speed * 2;
+            BOOL on = i % max == 0;
+            dispatch_async(dispatch_get_main_queue(), ^{ viewController.sliderB.on = on; } );
+            dispatch_async(dispatch_get_main_queue(), ^{ viewController.sliderD.on = on; } );
+            dispatch_async(dispatch_get_main_queue(), ^{ viewController.sliderE.on = !on; } );
+            dispatch_async(dispatch_get_main_queue(), ^{ viewController.sliderH.on = !on; } );
+            
+        } else {
+            
+        }
+        
+    }
+
+    viewController.modeCounter = (viewController.modeCounter + 1) % 8192;
+
     // default channel B and D
     int leftFrequency = 0;
     if (!viewController.sliderB.on && !viewController.sliderD.on) {
@@ -94,7 +159,7 @@ OSStatus RenderTone(    void *inRefCon,
 	return noErr;
 }
 
-@interface ViewController ()
+@interface ViewController () <UIActionSheetDelegate>
 
 @property (weak, nonatomic) IBOutlet UISwitch *labelB;
 @property (weak, nonatomic) IBOutlet UISwitch *labelD;
@@ -108,6 +173,8 @@ OSStatus RenderTone(    void *inRefCon,
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    
+    self.mode = @"Manual";
     
     NSError *error = nil;
     
@@ -206,6 +273,8 @@ OSStatus RenderTone(    void *inRefCon,
     [self.locationManager startMonitoringForRegion:self.beaconRegion];
 }
 
+
+
 // Set up the audio session for this app.
 - (BOOL) setupAudioSession {
     
@@ -232,6 +301,36 @@ OSStatus RenderTone(    void *inRefCon,
 {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+- (IBAction)showDisplayModes:(id)sender {
+    UIActionSheet *actionSheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Manual", @"Chain", @"Blink", @"Loop", @"Switch", @"Random", nil];
+    
+    [actionSheet showInView:self.view];
+}
+
+- (IBAction)toggleAll:(id)sender {
+    [self.sliderB setOn:self.switchAll.on animated:YES];
+    [self.sliderD setOn:self.switchAll.on animated:YES];
+    [self.sliderE setOn:self.switchAll.on animated:YES];
+    [self.sliderH setOn:self.switchAll.on animated:YES];
+}
+
+- (IBAction)totalChanged:(id)sender {
+    self.labelTotal.text = [NSString stringWithFormat:@"Total: %.f", self.stepperTotal.value];
+}
+- (IBAction)positionChanged:(id)sender {
+    self.labelPosition.text = [NSString stringWithFormat:@"Position: %.f", self.stepperPosition.value];
+}
+
+
+- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    NSString *mode = [actionSheet buttonTitleAtIndex:buttonIndex];
+    if (![mode isEqualToString:@"Cancel"]) {
+        self.mode = [actionSheet buttonTitleAtIndex:buttonIndex];
+    }
+    [self.buttonMode setTitle:[NSString stringWithFormat:@"Display Mode: %@", self.mode] forState:UIControlStateNormal];
 }
 
 - (void)locationManager:(CLLocationManager *)manager didDetermineState:(CLRegionState)state forRegion:(CLRegion *)region
