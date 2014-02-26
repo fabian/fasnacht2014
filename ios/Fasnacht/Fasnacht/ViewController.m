@@ -297,6 +297,11 @@ OSStatus RenderTone(    void *inRefCon,
     return YES;
 }
 
+-(NSUInteger)supportedInterfaceOrientations
+{
+    return UIInterfaceOrientationMaskAll;
+}
+
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
