@@ -1,6 +1,10 @@
 // Written for SparkFun EL Sequencer
 // https://www.sparkfun.com/products/11323
 
+int my_putc( char c, FILE *t) {
+    Serial.write( c );
+}
+
 void setup() {
     // The EL channels are on pins 2 through 9
     // Initialize the pins as outputs
@@ -20,6 +24,8 @@ void setup() {
     pinMode(13, OUTPUT);
     Serial.begin(9600);
     Serial.println("Fasnacht 2014");
+    
+    fdevopen( &my_putc, 0);
 }
 
 void loop() 
@@ -83,11 +89,6 @@ void loop()
         ValueLast = ValueState;
         ChannelLast = ChannelState;
     }
-    Serial.print("Max: ");
-    Serial.print(ValueHighest);
-    Serial.print(" Min: ");
-    Serial.print(ValueLowest);
-    Serial.println(" ");
 
     //get sampling time
     finish = millis();
@@ -98,53 +99,50 @@ void loop()
     ChannelFrq = ChannelCount * 100 / (time / 10) / 2;
     
     //get channel data and write output LEFT AUIO CHANNEL
-    Serial.print(ValueCount);
-    Serial.print(" ");
+    printf("Left Max:%4i Min:%4i Count:%4i | Right Max:%4i Min:%4i Count:%4i | Frq: ", ValueHighest, ValueLowest, ValueCount, ChannelHighest, ChannelLowest, ChannelCount);
     Serial.print(ValueFrq);
     Serial.print(" ");
+    Serial.print(ChannelFrq);
+    Serial.println(" ");
     if( (ValueFrq > 140) && (ValueFrq <= 160) ) {
       digitalWrite(3, 0); //B
       digitalWrite(5, 0); //D
-      Serial.println("B OFF D OFF ");
+      //Serial.println("B OFF D OFF ");
     } else if( (ValueFrq > 240) && (ValueFrq <= 260) ) {
       digitalWrite(3, 1); //B
       digitalWrite(5, 0); //D
-      Serial.println("B ON  D OFF ");
+      //Serial.println("B ON  D OFF ");
     } else if( (ValueFrq > 340) && (ValueFrq <= 360) ) {
       digitalWrite(3, 0); //B
       digitalWrite(5, 1); //D
-      Serial.println("B OFF D ON  ");
+      //Serial.println("B OFF D ON  ");
     } else if( (ValueFrq > 440) && (ValueFrq <= 460) ) {
       digitalWrite(3, 1); //B
       digitalWrite(5, 1); //D
-      Serial.println("B ON  D ON  "); 
+      //Serial.println("B ON  D ON  "); 
     } else {
-      Serial.println(" UNKNOWN B / D");
+      //Serial.println(" UNKNOWN B / D");
     }
 
     //get channel data and write output RIGHT AUIO CHANNEL
-    Serial.print(ChannelCount);
-    Serial.print(" ");
-    Serial.print(ChannelFrq);
-    Serial.print(" ");
     if( (ChannelFrq > 140) && (ChannelFrq <= 160) ) {
       digitalWrite(6, 0); //E
       digitalWrite(9, 0); //H
-      Serial.println("E OFF H OFF ");
+      //Serial.println("E OFF H OFF ");
     } else if( (ChannelFrq > 240) && (ChannelFrq <= 260) ) {
       digitalWrite(6, 1); //E
       digitalWrite(9, 0); //H
-      Serial.println("E ON  H OFF ");
+      //Serial.println("E ON  H OFF ");
     } else if( (ChannelFrq > 340) && (ChannelFrq <= 360) ) {
       digitalWrite(6, 0); //E
       digitalWrite(9, 1); //H
-      Serial.println("E OFF H ON  ");
+      //Serial.println("E OFF H ON  ");
     } else if( (ChannelFrq > 440) && (ChannelFrq <= 460) ) {
       digitalWrite(6, 1); //E
       digitalWrite(9, 1); //H
-      Serial.println("E ON  H ON  "); 
+      //Serial.println("E ON  H ON  "); 
     } else {
-      Serial.println(" UNKNOWN E / H");
+      //Serial.println(" UNKNOWN E / H");
     }
 
     /*
@@ -157,7 +155,7 @@ void loop()
     Serial.print("Brightness: ");
     Serial.println(brightness);
     */
-    Serial.println("---------------");
+    //Serial.println("---------------");
     
 
 //    analogWrite(3, brightness);
