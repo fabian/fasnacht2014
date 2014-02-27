@@ -3,4 +3,18 @@
         android:title="@string/pref_title_common_settings">
 
     </PreferenceCategory>
+    <PreferenceCategory
+        android:title="@string/pref_title_chain_mode">
+
+        <EditTextPreference android:inputType="number"
+            android:key="total_chain_members"
+            android:title="@string/total_chain_members"
+            android:defaultValue="@string/default_total_chain_members" />
+
+        <EditTextPreference android:inputType="number"
+            android:key="chain_position"
+            android:title="@string/chain_position"
+            android:defaultValue="@string/default_chain_position" />
+
+    </PreferenceCategory>
 </PreferenceScreen>

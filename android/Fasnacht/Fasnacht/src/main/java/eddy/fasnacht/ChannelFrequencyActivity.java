@@ -2,12 +2,15 @@ package eddy.fasnacht;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.Spinner;
 import android.widget.Switch;
@@ -23,11 +26,8 @@ import java.util.Map;
  * set a frequency per channel_frequency_item.
  *
  * TODO:
- * - Make chain configuration configurable
- * - Make "sync" button (reset chain)
+ * - Check chain configuration
  * - Make "loopsPerSecond" configurable
- * - Check if we can speed up channel frequency generator (at least 10 samples per second)
- * - Translate mode enum
  * - cleanup the mess ;)
  *
  * NICE: save frequencies when closing application.
@@ -35,6 +35,32 @@ import java.util.Map;
  * @author adrian
  */
 public class ChannelFrequencyActivity extends Activity {
+
+    private enum Mode {
+        MANUAL(R.string.manual_mode),
+        BLINK(R.string.blink_mode),
+        SWITCH(R.string.switch_mode),
+        RANDOM(R.string.random_mode),
+        CHAIN(R.string.chain_mode);
+
+        private int textId;
+        private CharSequence text;
+
+        private Mode(int textId) {
+            this.textId = textId;
+        }
+
+        public static void updateTexts(Activity activity) {
+            for (Mode mode : values()) {
+                mode.text = activity.getText(mode.textId);
+            }
+        }
+
+        @Override
+        public String toString() {
+            return text != null ? text.toString() : super.toString();
+        }
+    }
 
     public static enum Channel {
 
@@ -57,10 +83,6 @@ public class ChannelFrequencyActivity extends Activity {
             this.viewId = viewId;
         }
 
-        public int getChannelId() {
-            return channelId;
-        }
-
         public int getChannelName() {
             return channelName;
         }
@@ -69,17 +91,44 @@ public class ChannelFrequencyActivity extends Activity {
             return channelDetail;
         }
 
-        public String getChannelFrequencyPreferences() {
-            return channelFrequencyPreferences;
-        }
-
         public int getViewId() {
             return viewId;
         }
     }
 
-    public boolean getFrequency(Channel channel) {
-        return channelItems.get(channel).isChecked();
+    private static final int FREQUENCY_ONE = 150;
+    private static final int FREQUENCY_TWO = 250;
+    private static final int FREQUENCY_THREE = 350;
+    private static final int FREQUENCY_FOUR = 450;
+
+    public int getFrequencyRight() {
+        return getFrequency(Channel.THREE, Channel.FOUR);
+    }
+
+    public int getFrequencyLeft() {
+        return getFrequency(Channel.ONE, Channel.TWO);
+    }
+
+    private int getFrequency(Channel one, Channel two) {
+        return getFrequency(channelItems.get(one).isChecked(), channelItems.get(two).isChecked());
+    }
+
+    long lastTime = System.currentTimeMillis();
+
+    private int getFrequency(boolean one, boolean two) {
+        if (System.currentTimeMillis() - lastTime > 500) {
+            updateChannels();
+            lastTime = System.currentTimeMillis();
+        }
+        if (!one && !two) {
+            return FREQUENCY_TWO;
+        } else if (one && !two) {
+            return FREQUENCY_ONE;
+        } else if (!one && two) {
+            return FREQUENCY_FOUR;
+        } else {
+            return FREQUENCY_THREE;
+        }
     }
 
     /**
@@ -126,6 +175,11 @@ public class ChannelFrequencyActivity extends Activity {
 
     private FrequencyGenerator frequencyGenerator;
 
+    private int chainPosition;
+
+    private int totalChainMembers;
+
+
     /**
      * Array of channel items.
      */
@@ -136,9 +190,8 @@ public class ChannelFrequencyActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        frequencyGenerator = new FrequencyGenerator(this);
-
         setContentView(R.layout.channel_frequency);
+
         createChannelItem(Channel.ONE);
         createChannelItem(Channel.TWO);
         createChannelItem(Channel.THREE);
@@ -146,6 +199,7 @@ public class ChannelFrequencyActivity extends Activity {
 
         final Spinner spinner = (Spinner) findViewById(R.id.modes_spinner);
 
+        Mode.updateTexts(this);
         final ArrayAdapter<Mode> adapter = new ArrayAdapter<Mode>(this, android.R.layout.simple_spinner_dropdown_item, Mode.values());
 
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -161,7 +215,27 @@ public class ChannelFrequencyActivity extends Activity {
             }
         });
 
+        loadSettings();
+
+        final Button syncButton = (Button) findViewById(R.id.sync_button);
+        syncButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                lastTime = 0;
+                reset();
+            }
+        });
+
+        frequencyGenerator = new FrequencyGenerator(this);
         startFrequencyGenerator(true);
+    }
+
+    private void loadSettings() {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        // TODO save keys in a resource file
+        chainPosition = Integer.valueOf(preferences.getString("chain_position", "1"));
+        currentChainPos = 1;
+        totalChainMembers = Integer.valueOf(preferences.getString("total_chain_members", "4"));
     }
 
     private void createChannelItem(Channel channel) {
@@ -195,11 +269,15 @@ public class ChannelFrequencyActivity extends Activity {
         if (id == R.id.action_settings) {
             Intent intent = new Intent(this, SettingsActivity.class);
             startActivity(intent);
+            loadSettings();
             return true;
         } else if (id == R.id.action_start) {
+            reset();
             startFrequencyGenerator(true);
+            startThread();
             return true;
         } else if (id == R.id.action_stop) {
+            stopThread();
             startFrequencyGenerator(false);
             return true;
         }
@@ -222,23 +300,6 @@ public class ChannelFrequencyActivity extends Activity {
         }
     }
 
-    private enum Mode {
-        MANUAL(R.string.manual_mode),
-        CHAIN(R.string.chain_mode),
-        BLINK(R.string.blink_mode),
-        STILL(R.string.still_mode),
-        LOOP(R.string.loop_mode),
-        SWITCH(R.string.switch_mode),
-        RANDOM(R.string.random_mode);
-
-        private int textId;
-
-        private Mode(int textId) {
-            this.textId = textId;
-        }
-
-    }
-
     private void updateMode(Mode mode) {
         switch (mode) {
             case MANUAL:
@@ -253,13 +314,9 @@ public class ChannelFrequencyActivity extends Activity {
 
     private boolean running = false;
 
-    private double loopsPerSecond = 1;
+    private long loop = 500;
 
     private int currentChainPos;
-
-    private int myChainPos = 2;
-
-    private int maxChainPos = 7;
 
     private Mode currentMode = Mode.MANUAL;
 
@@ -267,9 +324,9 @@ public class ChannelFrequencyActivity extends Activity {
         @Override
         public void run() {
             while(running) {
-                updateChannels();
+                //updateChannels();
                 try {
-                    Thread.sleep((int) (1000.0 / loopsPerSecond));
+                    Thread.sleep((int) (loop));
                 } catch (InterruptedException e) {
                 }
             }
@@ -305,32 +362,21 @@ public class ChannelFrequencyActivity extends Activity {
                 switchChannel(channelItems.get(Channel.FOUR));
                 break;
             case CHAIN:
+                setChannels(currentChainPos == chainPosition, channelItems.values());
                 currentChainPos += 1;
-                if (currentChainPos >= maxChainPos) {
+                if (currentChainPos > totalChainMembers) {
                     currentChainPos = 1;
                 }
-                setChannels(currentChainPos == myChainPos, channelItems.values());
-                break;
-            case LOOP:
-                boolean nextChecked = channelItems.get(Channel.FOUR).isChecked();
-                for (ChannelFrequencyItem item : channelItems.values()) {
-                    boolean currentChecked = item.isChecked();
-                    item.setChecked(nextChecked);
-                    nextChecked = currentChecked;
-                }
-                break;
-            case STILL:
-                // do nothing
                 break;
             case SWITCH:
                 switchChannel(channelItems.get(Channel.ONE), channelItems.get(Channel.THREE));
                 switchChannel(channelItems.get(Channel.TWO), channelItems.get(Channel.FOUR));
                 break;
             case RANDOM:
-                channelItems.get(Channel.ONE).setChecked(Math.random() < 0.5);
-                channelItems.get(Channel.TWO).setChecked(Math.random() < 0.5);
-                channelItems.get(Channel.THREE).setChecked(Math.random() < 0.5);
-                channelItems.get(Channel.FOUR).setChecked(Math.random() < 0.5);
+                channelItems.get(Channel.ONE).setChecked(Math.random() < 0.45);
+                channelItems.get(Channel.TWO).setChecked(Math.random() < 0.45);
+                channelItems.get(Channel.THREE).setChecked(Math.random() < 0.45);
+                channelItems.get(Channel.FOUR).setChecked(Math.random() < 0.45);
                 break;
         }
     }
@@ -343,17 +389,8 @@ public class ChannelFrequencyActivity extends Activity {
                 channelItems.get(Channel.ONE).setChecked(true);
                 channelItems.get(Channel.TWO).setChecked(true);
                 break;
-            case LOOP:
-                channelItems.get(Channel.ONE).setChecked(true);
-                break;
-            case STILL:
-                channelItems.get(Channel.ONE).setChecked(true);
-                channelItems.get(Channel.TWO).setChecked(true);
-                channelItems.get(Channel.THREE).setChecked(true);
-                channelItems.get(Channel.FOUR).setChecked(true);
-                break;
             case CHAIN:
-                if (currentChainPos == myChainPos) {
+                if (currentChainPos == chainPosition) {
                     setChannels(true, channelItems.values());
                 }
         }

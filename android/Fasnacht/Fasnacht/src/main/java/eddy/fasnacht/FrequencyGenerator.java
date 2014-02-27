@@ -18,7 +18,7 @@ public final class FrequencyGenerator {
     private final String TAG = FrequencyGenerator.class.getSimpleName();
 
     private final double duration; // seconds
-    private final int sampleRate = 8000;
+    private final int sampleRate = 44100;
     private final int numSamples;
     private final double sampleLeft[];
     private final double sampleRight[];
@@ -43,20 +43,28 @@ public final class FrequencyGenerator {
 
     private boolean running = false;
 
+    private int audioTrackBufferSize;
+
     public FrequencyGenerator(ChannelFrequencyActivity activity) {
         this.activity = activity;
 
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(activity);
         duration = 1.0 / Integer.parseInt(sharedPref.getString("pref_loops_per_second", "2"));
-        //numSamples = (int) Math.round(duration * sampleRate);
 
-        numSamples = AudioRecord.getMinBufferSize(sampleRate,
+        int minBufferSize = AudioRecord.getMinBufferSize(sampleRate,
                 AudioFormat.CHANNEL_OUT_STEREO,
                 AudioFormat.ENCODING_PCM_16BIT);
 
+        long durationInMillis = 10;
+
+        numSamples = (int) (1.0 * sampleRate / (1000 / durationInMillis));
+        audioTrackBufferSize = numSamples - (numSamples % 4) + 4;
+
+        Log.i(TAG, "minBufferSize=" + minBufferSize + ", numSamples=" + numSamples + ", bufferSize=" + audioTrackBufferSize);
+
         audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC,
                 sampleRate, AudioFormat.CHANNEL_OUT_STEREO,
-                AudioFormat.ENCODING_PCM_16BIT, numSamples,
+                AudioFormat.ENCODING_PCM_16BIT, audioTrackBufferSize,
                 AudioTrack.MODE_STREAM);
 
         sampleLeft = new double[numSamples];
@@ -121,16 +129,18 @@ public final class FrequencyGenerator {
     }
 
     private void playSound(){
+        generateTone(activity.getFrequencyLeft(), activity.getFrequencyRight());
+        audioTrack.write(generatedSnd, 0, generatedSnd.length);
 
-        generateTone(
-                activity.getFrequency(ChannelFrequencyActivity.Channel.TWO),
-                activity.getFrequency(ChannelFrequencyActivity.Channel.ONE),
-                activity.getFrequency(ChannelFrequencyActivity.Channel.FOUR),
-                activity.getFrequency(ChannelFrequencyActivity.Channel.THREE));
-                audioTrack.write(generatedSnd, 0, generatedSnd.length);
+        long currentTime = System.currentTimeMillis();
+        Log.i(TAG, "Tone sent, diff is: " + (currentTime - lastTime) + ", numSamples=" + numSamples + ", bufferSize=" + audioTrackBufferSize);
+        lastTime = currentTime;
     }
 
+    private long lastTime = 0;
+
     private int generateFrequency(boolean channelOne, boolean channelTwo) {
+
         if (channelOne) {
             if (channelTwo) {
                 return 450;
