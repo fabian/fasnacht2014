@@ -303,6 +303,28 @@ OSStatus RenderTone(    void *inRefCon,
     [actionSheet showInView:self.view];
 }
 
+- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    NSString *mode = [actionSheet buttonTitleAtIndex:buttonIndex];
+    if (![mode isEqualToString:@"Cancel"]) {
+        self.mode = [actionSheet buttonTitleAtIndex:buttonIndex];
+        if ([self.mode isEqualToString:@"Manual"]) {
+            self.switchAll.enabled = YES;
+            self.sliderB.enabled = YES;
+            self.sliderD.enabled = YES;
+            self.sliderE.enabled = YES;
+            self.sliderH.enabled = YES;
+        } else {
+            self.switchAll.enabled = NO;
+            self.sliderB.enabled = NO;
+            self.sliderD.enabled = NO;
+            self.sliderE.enabled = NO;
+            self.sliderH.enabled = NO;
+        }
+    }
+    [self.buttonMode setTitle:[NSString stringWithFormat:@"%@", self.mode] forState:UIControlStateNormal];
+}
+
 - (IBAction)toggleAll:(id)sender {
     [self.sliderB setOn:self.switchAll.on animated:YES];
     [self.sliderD setOn:self.switchAll.on animated:YES];
@@ -315,16 +337,6 @@ OSStatus RenderTone(    void *inRefCon,
 }
 - (IBAction)positionChanged:(id)sender {
     self.labelPosition.text = [NSString stringWithFormat:@"Position: %.f", self.stepperPosition.value];
-}
-
-
-- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
-{
-    NSString *mode = [actionSheet buttonTitleAtIndex:buttonIndex];
-    if (![mode isEqualToString:@"Cancel"]) {
-        self.mode = [actionSheet buttonTitleAtIndex:buttonIndex];
-    }
-    [self.buttonMode setTitle:[NSString stringWithFormat:@"%@", self.mode] forState:UIControlStateNormal];
 }
 
 - (void)locationManager:(CLLocationManager *)manager didDetermineState:(CLRegionState)state forRegion:(CLRegion *)region
