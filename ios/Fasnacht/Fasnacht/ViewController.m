@@ -113,8 +113,8 @@ OSStatus RenderTone(    void *inRefCon,
     double thetaLeft = viewController.thetaLeft;
 	double thetaLeftIncrement = 2.0 * M_PI * leftFrequency / sampleRate;
     
-	// Left audio channel (which channel)
-	int channel = 1;
+	// Left audio channel
+	int channel = 0;
 	Float32 *buffer = (Float32 *)ioData->mBuffers[channel].mData;
 
 	for (UInt32 frame = 0; frame < inNumberFrames; frame++)
@@ -131,8 +131,8 @@ OSStatus RenderTone(    void *inRefCon,
 	// Store the theta back in the view controller
 	viewController.thetaLeft = thetaLeft;
 
-    // Right audio channel (light brightness)
-    channel = 0;
+    // Right audio channel
+    channel = 1;
 	buffer = (Float32 *)ioData->mBuffers[channel].mData;
     
     double thetaRight = viewController.thetaRight;
