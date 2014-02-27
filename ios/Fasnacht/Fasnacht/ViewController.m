@@ -19,13 +19,13 @@ OSStatus RenderTone(    void *inRefCon,
                         AudioBufferList 			*ioData)
 {
 	ViewController *viewController = (__bridge ViewController *)inRefCon;
-    //NSLog(@"Frames %i, %i", inNumberFrames, viewController.modeCounter * 1024 / 256);
+    //NSLog(@"Frames %i, %i", inNumberFrames, viewController.modeCounter / (4096 / inNumberFrames));
     
-    int i = (viewController.modeCounter * 1024 / inNumberFrames);
-    int speed = 32;
+    int i = (viewController.modeCounter / (4096 / inNumberFrames));
+    int speed = 8;
     if (i % speed == 0) {
         
-        NSLog(@"Time Interval: %f", [[NSDate date] timeIntervalSince1970] - viewController.lastTime);
+        //NSLog(@"Time Interval: %f", [[NSDate date] timeIntervalSince1970] - viewController.lastTime);
         viewController.lastTime = [[NSDate date] timeIntervalSince1970];
         
         if ([viewController.mode isEqualToString:@"Random"]) {
