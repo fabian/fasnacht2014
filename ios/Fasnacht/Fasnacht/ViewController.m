@@ -88,11 +88,11 @@ OSStatus RenderTone(    void *inRefCon,
 
     // default channel B and D
     int leftFrequency = 0;
-    if (!viewController.sliderB.on && !viewController.sliderD.on) {
+    if (viewController.sliderB.on && !viewController.sliderD.on) {
         leftFrequency = 150;
-    } else if (viewController.sliderB.on && !viewController.sliderD.on) {
+    } else if (!viewController.sliderB.on && !viewController.sliderD.on) {
         leftFrequency = 250;
-    } else if (!viewController.sliderB.on && viewController.sliderD.on) {
+    } else if (viewController.sliderB.on && viewController.sliderD.on) {
         leftFrequency = 350;
     } else {
         leftFrequency = 450;
@@ -100,11 +100,11 @@ OSStatus RenderTone(    void *inRefCon,
 
     // channel E and H
     int rightFrequency = 0;
-    if (!viewController.sliderE.on && !viewController.sliderH.on) {
+    if (viewController.sliderE.on && !viewController.sliderH.on) {
         rightFrequency = 150;
-    } else if (viewController.sliderE.on && !viewController.sliderH.on) {
+    } else if (!viewController.sliderE.on && !viewController.sliderH.on) {
         rightFrequency = 250;
-    } else if (!viewController.sliderE.on && viewController.sliderH.on) {
+    } else if (viewController.sliderE.on && viewController.sliderH.on) {
         rightFrequency = 350;
     } else {
         rightFrequency = 450;
