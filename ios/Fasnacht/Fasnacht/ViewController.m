@@ -30,13 +30,14 @@ OSStatus RenderTone(    void *inRefCon,
         
         if ([viewController.mode isEqualToString:@"Random"]) {
             
-            int randomB = (arc4random() % ((unsigned)RAND_MAX + 1));
+            srand(i);
+            int randomB = rand();
             dispatch_async(dispatch_get_main_queue(), ^{ viewController.sliderB.on = (randomB % 5 == 0); } );
-            int randomD = (arc4random() % ((unsigned)RAND_MAX + 1));
+            int randomD = rand();
             dispatch_async(dispatch_get_main_queue(), ^{ viewController.sliderD.on = (randomD % 5 == 0); } );
-            int randomE = (arc4random() % ((unsigned)RAND_MAX + 1));
+            int randomE = rand();
             dispatch_async(dispatch_get_main_queue(), ^{ viewController.sliderE.on = (randomE % 5 == 0); } );
-            int randomH = (arc4random() % ((unsigned)RAND_MAX + 1));
+            int randomH = rand();
             dispatch_async(dispatch_get_main_queue(), ^{ viewController.sliderH.on = (randomH % 5 == 0); } );
             
         } else if ([viewController.mode isEqualToString:@"Loop"]) {
