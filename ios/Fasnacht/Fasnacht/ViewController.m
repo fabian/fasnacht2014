@@ -19,14 +19,15 @@ OSStatus RenderTone(    void *inRefCon,
                         AudioBufferList 			*ioData)
 {
 	ViewController *viewController = (__bridge ViewController *)inRefCon;
-    //NSLog(@"Frames %i, %i", inNumberFrames, viewController.modeCounter / (4096 / inNumberFrames));
+    //NSLog(@"Frames %i, %i", inNumberFrames, viewController.modeCounter);
     
-    int i = (viewController.modeCounter / (4096 / inNumberFrames));
-    int speed = 8;
-    if (i % speed == 0) {
+    float speed = 0.5;
+    if ([[NSDate date] timeIntervalSince1970] - viewController.lastTime > speed) {
         
         //NSLog(@"Time Interval: %f", [[NSDate date] timeIntervalSince1970] - viewController.lastTime);
         viewController.lastTime = [[NSDate date] timeIntervalSince1970];
+        
+        int i = viewController.modeCounter;
         
         if ([viewController.mode isEqualToString:@"Random"]) {
             
@@ -42,8 +43,8 @@ OSStatus RenderTone(    void *inRefCon,
             
         } else if ([viewController.mode isEqualToString:@"Chain"]) {
             
-            int max = speed * viewController.stepperTotal.value;
-            BOOL on = i % max == speed * viewController.stepperPosition.value;
+            int max = viewController.stepperTotal.value;
+            BOOL on = i % max == viewController.stepperPosition.value - 1;
             dispatch_async(dispatch_get_main_queue(), ^{ viewController.sliderB.on = on; } );
             dispatch_async(dispatch_get_main_queue(), ^{ viewController.sliderD.on = on; } );
             dispatch_async(dispatch_get_main_queue(), ^{ viewController.sliderE.on = on; } );
@@ -51,7 +52,7 @@ OSStatus RenderTone(    void *inRefCon,
             
         } else if ([viewController.mode isEqualToString:@"Blink"]) {
             
-            int max = speed * 2;
+            int max = 2;
             BOOL on = i % max == 0;
             dispatch_async(dispatch_get_main_queue(), ^{ viewController.sliderB.on = on; } );
             dispatch_async(dispatch_get_main_queue(), ^{ viewController.sliderD.on = on; } );
@@ -60,7 +61,7 @@ OSStatus RenderTone(    void *inRefCon,
             
         } else if ([viewController.mode isEqualToString:@"Switch"]) {
             
-            int max = speed * 2;
+            int max = 2;
             BOOL on = i % max == 0;
             dispatch_async(dispatch_get_main_queue(), ^{ viewController.sliderB.on = on; } );
             dispatch_async(dispatch_get_main_queue(), ^{ viewController.sliderD.on = on; } );
@@ -70,10 +71,9 @@ OSStatus RenderTone(    void *inRefCon,
         } else {
             
         }
-        
-    }
 
-    viewController.modeCounter = (viewController.modeCounter + 1) % 8192;
+        viewController.modeCounter = (i + 1) % 8192;
+    }
 
     // default channel B and D
     int leftFrequency = 0;
@@ -301,6 +301,11 @@ OSStatus RenderTone(    void *inRefCon,
     UIActionSheet *actionSheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Manual", @"Blink", @"Switch", @"Random", @"Chain", nil];
     
     [actionSheet showInView:self.view];
+}
+
+- (IBAction)sync:(id)sender {
+    self.modeCounter = 0;
+    self.lastTime = 0;
 }
 
 - (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
