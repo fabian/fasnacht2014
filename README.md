@@ -3,10 +3,10 @@ Fasnacht 2014
 
 | Channel B / E | Channel D / H | Freq. thresholds |
 | ------------- | ------------- | ---------------- |
-|           off |           off |    140Hz - 160Hz |
-|            on |           off |    240Hz - 260Hz |
-|           off |            on |    340Hz - 360Hz |
-|            on |            on |    440Hz - 460Hz |
+|            on |           off |    100Hz - 199Hz |
+|           off |           off |    200Hz - 299Hz |
+|            on |            on |    300Hz - 399Hz |
+|           off |            on |    400Hz - 499Hz |
 
 Channel B und D werden über den linken Audio-Kanal, Channel E und H über den rechten Audio-Kanal gesteuert. Im vergleich zum Mode 1 kann ein Kanal 4 mal schneller in bzw. ausgeschaltet werden, dafür wird auf die Möglichkeit vom "dimmen" verzichtet.
 
