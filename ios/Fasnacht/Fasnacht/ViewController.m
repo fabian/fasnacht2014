@@ -304,7 +304,7 @@ OSStatus RenderTone(    void *inRefCon,
 }
 
 - (IBAction)startSync:(id)sender {
-    [self.header setBackgroundColor:[UIColor whiteColor]];
+    [self.header setBackgroundColor:[UIColor lightGrayColor]];
 }
 
 - (IBAction)cancelSync:(id)sender {
