@@ -13,6 +13,8 @@
 
 @interface ViewController : UIViewController
 
+@property (weak, nonatomic) IBOutlet UIView *header;
+
 @property (weak, nonatomic) IBOutlet UISwitch *switchAll;
 @property (weak, nonatomic) IBOutlet UISwitch *sliderB;
 @property (weak, nonatomic) IBOutlet UISwitch *sliderD;

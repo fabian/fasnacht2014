@@ -303,7 +303,16 @@ OSStatus RenderTone(    void *inRefCon,
     [actionSheet showInView:self.view];
 }
 
+- (IBAction)startSync:(id)sender {
+    [self.header setBackgroundColor:[UIColor whiteColor]];
+}
+
+- (IBAction)cancelSync:(id)sender {
+    [self.header setBackgroundColor:[UIColor groupTableViewBackgroundColor]];
+}
+
 - (IBAction)sync:(id)sender {
+    [self.header setBackgroundColor:[UIColor groupTableViewBackgroundColor]];
     self.modeCounter = 0;
     self.lastTime = 0;
 }

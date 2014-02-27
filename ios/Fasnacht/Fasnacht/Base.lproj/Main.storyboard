@@ -46,6 +46,8 @@
                                             <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                         </state>
                                         <connections>
+                                            <action selector="cancelSync:" destination="vXZ-lx-hvc" eventType="touchUpOutside" id="IvP-f5-JAm"/>
+                                            <action selector="startSync:" destination="vXZ-lx-hvc" eventType="touchDown" id="UDH-4Y-Elc"/>
                                             <action selector="sync:" destination="vXZ-lx-hvc" eventType="touchUpInside" id="q86-W8-szB"/>
                                         </connections>
                                     </button>
@@ -177,6 +179,7 @@
                     </view>
                     <connections>
                         <outlet property="buttonMode" destination="Suz-HV-5UK" id="Fqb-ov-vWP"/>
+                        <outlet property="header" destination="wgX-pA-9UW" id="v3x-1b-oa4"/>
                         <outlet property="labelPosition" destination="IXA-tY-j60" id="eNI-PL-wAK"/>
                         <outlet property="labelTotal" destination="1pL-ow-ejr" id="doB-KW-M6e"/>
                         <outlet property="sliderB" destination="Z73-Hp-cYy" id="uKC-Gf-PBB"/>
