@@ -112,7 +112,7 @@ void loop()
       digitalWrite(3, 0); //B
       digitalWrite(5, 0); //D
       //Serial.println("B ON  D OFF ");
-    } else if( (ValueFrq >= 300) && (ValueFrq <= 399) ) {
+    } else if(((ValueFrq >= 300) && (ValueFrq <= 399)) || ValueFrq > 499) {
       digitalWrite(3, 1); //B
       digitalWrite(5, 1); //D
       //Serial.println("B OFF D ON  ");
@@ -133,7 +133,7 @@ void loop()
       digitalWrite(6, 0); //E
       digitalWrite(9, 0); //H
       //Serial.println("E ON  H OFF ");
-    } else if( (ChannelFrq >= 300) && (ChannelFrq <= 399) ) {
+    } else if(((ChannelFrq >= 300) && (ChannelFrq <= 399)) || ChannelFrq > 499) {
       digitalWrite(6, 1); //E
       digitalWrite(9, 1); //H
       //Serial.println("E OFF H ON  ");
