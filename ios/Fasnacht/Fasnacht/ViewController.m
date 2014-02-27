@@ -298,7 +298,7 @@ OSStatus RenderTone(    void *inRefCon,
 }
 
 - (IBAction)showDisplayModes:(id)sender {
-    UIActionSheet *actionSheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Manual", @"Chain", @"Blink", @"Switch", @"Random", nil];
+    UIActionSheet *actionSheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Manual", @"Blink", @"Switch", @"Random", @"Chain", nil];
     
     [actionSheet showInView:self.view];
 }
@@ -311,7 +311,7 @@ OSStatus RenderTone(    void *inRefCon,
 }
 
 - (IBAction)totalChanged:(id)sender {
-    self.labelTotal.text = [NSString stringWithFormat:@"Total: %.f", self.stepperTotal.value];
+    self.labelTotal.text = [NSString stringWithFormat:@"Chain Total: %.f", self.stepperTotal.value];
 }
 - (IBAction)positionChanged:(id)sender {
     self.labelPosition.text = [NSString stringWithFormat:@"Position: %.f", self.stepperPosition.value];
@@ -324,7 +324,7 @@ OSStatus RenderTone(    void *inRefCon,
     if (![mode isEqualToString:@"Cancel"]) {
         self.mode = [actionSheet buttonTitleAtIndex:buttonIndex];
     }
-    [self.buttonMode setTitle:[NSString stringWithFormat:@"Display Mode: %@", self.mode] forState:UIControlStateNormal];
+    [self.buttonMode setTitle:[NSString stringWithFormat:@"%@", self.mode] forState:UIControlStateNormal];
 }
 
 - (void)locationManager:(CLLocationManager *)manager didDetermineState:(CLRegionState)state forRegion:(CLRegion *)region
