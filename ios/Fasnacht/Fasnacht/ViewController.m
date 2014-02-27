@@ -40,18 +40,6 @@ OSStatus RenderTone(    void *inRefCon,
             int randomH = rand();
             dispatch_async(dispatch_get_main_queue(), ^{ viewController.sliderH.on = (randomH % 5 == 0); } );
             
-        } else if ([viewController.mode isEqualToString:@"Loop"]) {
-            
-            int max = speed * 4;
-            BOOL onB = i % max == speed * 0;
-            dispatch_async(dispatch_get_main_queue(), ^{ viewController.sliderB.on = onB; } );
-            BOOL onD = i % max == speed * 1;
-            dispatch_async(dispatch_get_main_queue(), ^{ viewController.sliderD.on = onD; } );
-            BOOL onE = i % max == speed * 2;
-            dispatch_async(dispatch_get_main_queue(), ^{ viewController.sliderE.on = onE; } );
-            BOOL onH = i % max == speed * 3;
-            dispatch_async(dispatch_get_main_queue(), ^{ viewController.sliderH.on = onH; } );
-            
         } else if ([viewController.mode isEqualToString:@"Chain"]) {
             
             int max = speed * viewController.stepperTotal.value;
@@ -310,7 +298,7 @@ OSStatus RenderTone(    void *inRefCon,
 }
 
 - (IBAction)showDisplayModes:(id)sender {
-    UIActionSheet *actionSheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Manual", @"Chain", @"Blink", @"Loop", @"Switch", @"Random", nil];
+    UIActionSheet *actionSheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Manual", @"Chain", @"Blink", @"Switch", @"Random", nil];
     
     [actionSheet showInView:self.view];
 }
