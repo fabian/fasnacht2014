@@ -5,7 +5,8 @@
         <EditTextPreference android:inputType="number"
             android:key="pref_interval"
             android:title="@string/pref_title_interval"
-            android:defaultValue="@string/default_interval" />
+            android:defaultValue="@string/default_interval"
+            android:selectAllOnFocus="true"/>
 
     </PreferenceCategory>
 
@@ -15,12 +16,14 @@
         <EditTextPreference android:inputType="number"
             android:key="pref_total_chain_members"
             android:title="@string/pref_title_total_chain_members"
-            android:defaultValue="@string/default_total_chain_members" />
+            android:defaultValue="@string/default_total_chain_members"
+            android:selectAllOnFocus="true"/>
 
         <EditTextPreference android:inputType="number"
             android:key="pref_chain_position"
             android:title="@string/pref_title_chain_position"
-            android:defaultValue="@string/default_chain_position" />
+            android:defaultValue="@string/default_chain_position"
+            android:selectAllOnFocus="true"/>
 
     </PreferenceCategory>
 </PreferenceScreen>
