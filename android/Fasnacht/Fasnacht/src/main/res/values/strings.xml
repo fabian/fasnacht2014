@@ -2,7 +2,7 @@
 <resources>
 
     <string name="app_name">Fasnacht</string>
-    <string name="title_activity_fasnacht">Fasnacht</string>
+    <string name="title_activity_fasnacht">Fasnacht 2014</string>
 
     <string name="action_settings">Settings</string>
     <string name="action_start">Start</string>
@@ -23,14 +23,14 @@
 
     <string name="pref_title_common_settings">Common Settings</string>
 
-    <string name="loops_per_second">Interval in ms</string>
-    <string name="pref_default_loops_per_second">740</string>
+    <string name="pref_title_interval">Interval in ms</string>
+    <string name="default_interval">500</string>
 
     <string name="pref_title_chain_mode">Chain mode</string>
 
-    <string name="total_chain_members">Total chain members</string>
-    <string name="default_total_chain_members">8</string>
-    <string name="chain_position">Chain position</string>
+    <string name="pref_title_total_chain_members">Total chain members</string>
+    <string name="default_total_chain_members">6</string>
+    <string name="pref_title_chain_position">Chain position</string>
     <string name="default_chain_position">1</string>
 
     <string name="manual_mode">Manual</string>

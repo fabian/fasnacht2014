@@ -2,18 +2,24 @@
     <PreferenceCategory
         android:title="@string/pref_title_common_settings">
 
+        <EditTextPreference android:inputType="number"
+            android:key="pref_interval"
+            android:title="@string/pref_title_interval"
+            android:defaultValue="@string/default_interval" />
+
     </PreferenceCategory>
+
     <PreferenceCategory
         android:title="@string/pref_title_chain_mode">
 
         <EditTextPreference android:inputType="number"
-            android:key="total_chain_members"
-            android:title="@string/total_chain_members"
+            android:key="pref_total_chain_members"
+            android:title="@string/pref_title_total_chain_members"
             android:defaultValue="@string/default_total_chain_members" />
 
         <EditTextPreference android:inputType="number"
-            android:key="chain_position"
-            android:title="@string/chain_position"
+            android:key="pref_chain_position"
+            android:title="@string/pref_title_chain_position"
             android:defaultValue="@string/default_chain_position" />
 
     </PreferenceCategory>

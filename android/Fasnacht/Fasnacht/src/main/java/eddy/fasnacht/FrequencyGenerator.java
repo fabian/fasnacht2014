@@ -7,6 +7,7 @@ import android.media.AudioRecord;
 import android.media.AudioTrack;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import eddy.fasnacht.ChannelFrequencyActivity.FrequencyHolder;
 
 /**
  * Static class which generates the frequencies and send the to the audio output.
@@ -17,7 +18,6 @@ public final class FrequencyGenerator {
 
     private final String TAG = FrequencyGenerator.class.getSimpleName();
 
-    private final double duration; // seconds
     private final int sampleRate = 44100;
     private final int numSamples;
     private final double sampleLeft[];
@@ -48,19 +48,12 @@ public final class FrequencyGenerator {
     public FrequencyGenerator(ChannelFrequencyActivity activity) {
         this.activity = activity;
 
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(activity);
-        duration = 1.0 / Integer.parseInt(sharedPref.getString("pref_loops_per_second", "2"));
-
-        int minBufferSize = AudioRecord.getMinBufferSize(sampleRate,
-                AudioFormat.CHANNEL_OUT_STEREO,
-                AudioFormat.ENCODING_PCM_16BIT);
-
         long durationInMillis = 10;
 
         numSamples = (int) (1.0 * sampleRate / (1000 / durationInMillis));
         audioTrackBufferSize = numSamples - (numSamples % 4) + 4;
 
-        Log.i(TAG, "minBufferSize=" + minBufferSize + ", numSamples=" + numSamples + ", bufferSize=" + audioTrackBufferSize);
+        Log.i(TAG, "numSamples=" + numSamples + ", bufferSize=" + audioTrackBufferSize);
 
         audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC,
                 sampleRate, AudioFormat.CHANNEL_OUT_STEREO,
@@ -99,7 +92,6 @@ public final class FrequencyGenerator {
             }
         }
         return 0;
-
     }
 
     private void generateTone(int freqOfToneLeft, int freqOfToneRight) {
@@ -128,35 +120,14 @@ public final class FrequencyGenerator {
         }
     }
 
+    private FrequencyHolder currentFrequencies;
+
     private void playSound(){
-        generateTone(activity.getFrequencyLeft(), activity.getFrequencyRight());
-        audioTrack.write(generatedSnd, 0, generatedSnd.length);
-
-        long currentTime = System.currentTimeMillis();
-        Log.i(TAG, "Tone sent, diff is: " + (currentTime - lastTime) + ", numSamples=" + numSamples + ", bufferSize=" + audioTrackBufferSize);
-        lastTime = currentTime;
-    }
-
-    private long lastTime = 0;
-
-    private int generateFrequency(boolean channelOne, boolean channelTwo) {
-
-        if (channelOne) {
-            if (channelTwo) {
-                return 450;
-            } else {
-                return 350;
-            }
-        } else {
-            if (channelTwo) {
-                return 250;
-            } else {
-                return 150;
-            }
+        if (activity.updateNeeded()) {
+            currentFrequencies = activity.getFrequencies();
         }
-    }
-    private void generateTone(boolean channelOne, boolean channelTwo, boolean channelThree, boolean channelFour) {
-        generateTone(generateFrequency(channelOne, channelTwo), generateFrequency(channelThree, channelFour));
+        generateTone(currentFrequencies.getLeft(), currentFrequencies.getRight());
+        audioTrack.write(generatedSnd, 0, generatedSnd.length);
     }
 
     public boolean isRunning() {

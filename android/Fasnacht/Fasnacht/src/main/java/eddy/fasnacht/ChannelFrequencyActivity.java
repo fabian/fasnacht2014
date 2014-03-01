@@ -26,11 +26,8 @@ import java.util.Map;
  * set a frequency per channel_frequency_item.
  *
  * TODO:
- * - Check chain configuration
- * - Make "loopsPerSecond" configurable
+ * - Save configuration keys in a resource file
  * - cleanup the mess ;)
- *
- * NICE: save frequencies when closing application.
  *
  * @author adrian
  */
@@ -64,22 +61,18 @@ public class ChannelFrequencyActivity extends Activity {
 
     public static enum Channel {
 
-        ONE  (1, R.string.channel_1_title, R.string.channel_1_detail, "pref_channel_1_frequency", R.id.channel_frequency_item_1),
-        TWO  (2, R.string.channel_2_title, R.string.channel_2_detail, "pref_channel_2_frequency", R.id.channel_frequency_item_2),
-        THREE(3, R.string.channel_3_title, R.string.channel_3_detail, "pref_channel_3_frequency", R.id.channel_frequency_item_3),
-        FOUR (4, R.string.channel_4_title, R.string.channel_4_detail, "pref_channel_4_frequency", R.id.channel_frequency_item_4);
+        ONE  (R.string.channel_1_title, R.string.channel_1_detail, R.id.channel_frequency_item_1),
+        TWO  (R.string.channel_2_title, R.string.channel_2_detail, R.id.channel_frequency_item_2),
+        THREE(R.string.channel_3_title, R.string.channel_3_detail, R.id.channel_frequency_item_3),
+        FOUR (R.string.channel_4_title, R.string.channel_4_detail, R.id.channel_frequency_item_4);
 
-        private int channelId;
         private int channelName;
         private int channelDetail;
-        private String channelFrequencyPreferences;
         private int viewId;
 
-        Channel(int channelId, int channelName, int channelDetail, String channelFrequencyPreferences, int viewId) {
-            this.channelId = channelId;
+        Channel(int channelName, int channelDetail, int viewId) {
             this.channelName = channelName;
             this.channelDetail = channelDetail;
-            this.channelFrequencyPreferences = channelFrequencyPreferences;
             this.viewId = viewId;
         }
 
@@ -96,38 +89,21 @@ public class ChannelFrequencyActivity extends Activity {
         }
     }
 
-    private static final int FREQUENCY_ONE = 150;
-    private static final int FREQUENCY_TWO = 250;
-    private static final int FREQUENCY_THREE = 350;
-    private static final int FREQUENCY_FOUR = 450;
+    public static class FrequencyHolder {
+        private int left;
+        private int right;
 
-    public int getFrequencyRight() {
-        return getFrequency(Channel.THREE, Channel.FOUR);
-    }
-
-    public int getFrequencyLeft() {
-        return getFrequency(Channel.ONE, Channel.TWO);
-    }
-
-    private int getFrequency(Channel one, Channel two) {
-        return getFrequency(channelItems.get(one).isChecked(), channelItems.get(two).isChecked());
-    }
-
-    long lastTime = System.currentTimeMillis();
-
-    private int getFrequency(boolean one, boolean two) {
-        if (System.currentTimeMillis() - lastTime > 500) {
-            updateChannels();
-            lastTime = System.currentTimeMillis();
+        private FrequencyHolder(int left, int right) {
+            this.left = left;
+            this.right = right;
         }
-        if (!one && !two) {
-            return FREQUENCY_TWO;
-        } else if (one && !two) {
-            return FREQUENCY_ONE;
-        } else if (!one && two) {
-            return FREQUENCY_FOUR;
-        } else {
-            return FREQUENCY_THREE;
+
+        public int getLeft() {
+            return left;
+        }
+
+        public int getRight() {
+            return right;
         }
     }
 
@@ -173,16 +149,23 @@ public class ChannelFrequencyActivity extends Activity {
         }
     }
 
+    private static final int FREQUENCY_ONE = 150;
+    private static final int FREQUENCY_TWO = 250;
+    private static final int FREQUENCY_THREE = 350;
+    private static final int FREQUENCY_FOUR = 450;
+
     private FrequencyGenerator frequencyGenerator;
 
+    // settings
+    private int interval;
     private int chainPosition;
-
     private int totalChainMembers;
 
+    // loop variables
+    private long lastTime;
+    private Mode currentMode = Mode.MANUAL;
+    private int currentChainPos;
 
-    /**
-     * Array of channel items.
-     */
     private Map<Channel, ChannelFrequencyItem> channelItems =
             new EnumMap<Channel, ChannelFrequencyItem>(Channel.class);
 
@@ -207,15 +190,14 @@ public class ChannelFrequencyActivity extends Activity {
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                updateMode(adapter.getItem(position));
+                currentMode = adapter.getItem(position);
+                reset();
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
             }
         });
-
-        loadSettings();
 
         final Button syncButton = (Button) findViewById(R.id.sync_button);
         syncButton.setOnClickListener(new View.OnClickListener() {
@@ -226,16 +208,17 @@ public class ChannelFrequencyActivity extends Activity {
             }
         });
 
+        loadSettings();
         frequencyGenerator = new FrequencyGenerator(this);
         startFrequencyGenerator(true);
     }
 
     private void loadSettings() {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        // TODO save keys in a resource file
-        chainPosition = Integer.valueOf(preferences.getString("chain_position", "1"));
-        currentChainPos = 1;
-        totalChainMembers = Integer.valueOf(preferences.getString("total_chain_members", "4"));
+        interval = Integer.valueOf(preferences.getString("pref_interval", "1"));
+        chainPosition = Integer.valueOf(preferences.getString("pref_chain_position", "1"));
+        totalChainMembers = Integer.valueOf(preferences.getString("pref_total_chain_members", "6"));
+        reset();
     }
 
     private void createChannelItem(Channel channel) {
@@ -268,20 +251,22 @@ public class ChannelFrequencyActivity extends Activity {
         int id = item.getItemId();
         if (id == R.id.action_settings) {
             Intent intent = new Intent(this, SettingsActivity.class);
-            startActivity(intent);
-            loadSettings();
+            startActivityForResult(intent, 0);
             return true;
         } else if (id == R.id.action_start) {
             reset();
             startFrequencyGenerator(true);
-            startThread();
             return true;
         } else if (id == R.id.action_stop) {
-            stopThread();
             startFrequencyGenerator(false);
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        loadSettings();
     }
 
     private void startFrequencyGenerator(boolean start) {
@@ -303,53 +288,36 @@ public class ChannelFrequencyActivity extends Activity {
     private void updateMode(Mode mode) {
         switch (mode) {
             case MANUAL:
-                stopThread();
                 break;
             default:
                 currentMode = mode;
                 reset();
-                startThread();
         }
     }
 
-    private boolean running = false;
-
-    private long loop = 500;
-
-    private int currentChainPos;
-
-    private Mode currentMode = Mode.MANUAL;
-
-    private Runnable runnable = new Runnable() {
-        @Override
-        public void run() {
-            while(running) {
-                //updateChannels();
-                try {
-                    Thread.sleep((int) (loop));
-                } catch (InterruptedException e) {
-                }
-            }
-        }
-    };
-    private Thread thread;
-
-    private void startThread() {
-        if (!running) {
-            running = true;
-            thread = new Thread(runnable);
-            thread.start();
-        }
+    public boolean updateNeeded() {
+        return System.currentTimeMillis() - lastTime >= interval;
     }
 
-    private void stopThread() {
-        if (running) {
-            running = false;
-            try {
-                thread.join();
-            } catch (InterruptedException e) {
-            }
-            thread = null;
+    public FrequencyHolder getFrequencies() {
+        updateChannels();
+        lastTime = System.currentTimeMillis();
+        return new FrequencyHolder(getFrequency(Channel.ONE, Channel.TWO), getFrequency(Channel.THREE, Channel.FOUR));
+    }
+
+    private int getFrequency(Channel one, Channel two) {
+        return getFrequency(channelItems.get(one).isChecked(), channelItems.get(two).isChecked());
+    }
+
+    private int getFrequency(boolean one, boolean two) {
+        if (!one && !two) {
+            return FREQUENCY_TWO;
+        } else if (one && !two) {
+            return FREQUENCY_ONE;
+        } else if (!one && two) {
+            return FREQUENCY_FOUR;
+        } else {
+            return FREQUENCY_THREE;
         }
     }
 
