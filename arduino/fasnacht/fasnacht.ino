@@ -99,11 +99,11 @@ void loop()
     ChannelFrq = ChannelCount * 100 / (time / 10) / 2;
     
     //get channel data and write output LEFT AUIO CHANNEL
-    printf("Left Max:%4i Min:%4i Count:%4i | Right Max:%4i Min:%4i Count:%4i | Frq: ", ValueHighest, ValueLowest, ValueCount, ChannelHighest, ChannelLowest, ChannelCount);
-    Serial.print(ValueFrq);
-    Serial.print(" ");
-    Serial.print(ChannelFrq);
-    Serial.println(" ");
+    //printf("Left Max:%4i Min:%4i Count:%4i | Right Max:%4i Min:%4i Count:%4i | Frq: ", ValueHighest, ValueLowest, ValueCount, ChannelHighest, ChannelLowest, ChannelCount);
+    //Serial.print(ValueFrq);
+    //Serial.print(" ");
+    //Serial.print(ChannelFrq);
+    //Serial.println(" ");
     if( (ValueFrq >= 100) && (ValueFrq <= 199) ) {
       digitalWrite(3, 1); //B
       digitalWrite(5, 0); //D
